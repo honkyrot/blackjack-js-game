@@ -1,0 +1,297 @@
+@font-face { /*custom font Montserrat*/
+    font-family: "Montserrat";
+    src: url("media/Montserrat-Medium.ttf");
+}
+
+/* general */
+p {
+    font-family: "Montserrat";
+    color: #ffffff;
+    font-size: 22px;
+    margin: 10px;
+}
+
+/* background */
+/* background is black for now */
+body {
+    background-color: #000000;
+}
+
+/* title h1 */
+h1 {
+    font-family: "Montserrat";
+    color: #ffffff;
+    font-size: 40px;
+}
+
+/* slighty bigger font for h2 */
+h2 {
+    font-family: "Montserrat";
+    color: #ffffff;
+    font-size: 30px;
+    margin: 10px;
+}
+
+/* classes */
+
+/* background div gradient */
+/* gradient is dymanic to show whos turn it is, here is a simple placeholder */
+.background_gradient {  
+    background: linear-gradient(to bottom, #00ff37, #000000);
+    background-size: 400% 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -5;
+}
+
+.title_div {
+    color: #ffffff;
+    font-size: 50px;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* for the cards and stuff to be held in */
+.playing_board {
+    background-color: rgba(100, 100, 100, 0.5);
+    border-radius: 16px;
+    padding: 2px;
+    left: 50%;
+    height: 70%;
+    text-align: center;
+}
+
+.dealers_hand_div {
+    text-align: center;
+}
+
+/* for the dealers cards to be held in */
+.dealers_hand_container {
+    background-color: rgba(0, 0, 0, 0);
+    padding: 10px;
+    margin: 2px;
+    display: inline-block;
+    width: fit-content;
+    height: 150px;
+}
+
+/* dealer hand score */
+.dealer_hand_value_div {
+    background-color: #000000;
+    padding: 0px;
+    width: fit-content;
+    position: relative;
+    border-radius: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.players_hand_div {
+    text-align: center;
+}
+
+/* for the players cards to be held in */
+.players_hand_container {
+    background-color: rgba(0, 0, 0, 0);
+    padding: 10px;
+    margin: 2px;
+    display: inline-block;
+    width: 50%;
+    height: 150px;
+}
+
+/* player hand score */
+.player_hand_value_div {
+    background-color: #000000;
+    padding: 0px;
+    width: fit-content;
+    position: relative;
+    border-radius: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* funny little line */
+.line_split_1 {
+    background-color: #ffffff;
+    display: inline-block;
+    border-radius: 5px;
+    width: 50%;
+    height: 10px;
+}   
+
+/* your body for actions div */
+.game_div {
+    background-color: rgba(100, 100, 100, 0.5);
+    position: relative;
+    top: 10px;
+    border-radius: 16px;
+    height: 25%;
+}
+
+/* title for actions div */
+.action_text {
+    position: absolute;
+    top: 0%;
+}
+
+/* the betting part, (no real money involved) */
+.betting_div {
+    position: absolute;
+    top: 0%;    
+    left: 15%;
+}
+
+/* container for buttons */ 
+.action_buttons {
+    flex-direction: column;
+    display: flex;
+}
+
+/* container for BETTING buttons */
+.betting_buttons {
+    flex-direction: row;
+    display: flex;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+}
+
+/* div for custom betting inputs */
+.custom_bet {
+    position: absolute;
+    top: 35%;
+    left: 15%;
+}
+
+/* div to show your bet amounts */
+.bet_amount {
+    position: absolute;
+    top: 52%;
+    left: 15%;
+}
+
+/* div title for the bank */
+.bank_div {
+    position: absolute;
+    top: 0%;
+    left: 45%;
+}
+
+/* text div to show your bank amount */
+.bank_amount {
+    position: absolute;
+    top: 15%;
+    left: 45%;
+}
+
+/* div for the game status */
+.game_actions_div {
+    position: absolute;
+    top: 40%;
+    left: 45%;
+}
+
+.gane_actions_buttons {
+    flex-direction: column;
+    display: flex;
+    position: absolute;
+    top: 55%;
+    left: 45%;
+}
+
+.game_message_box{
+    background-color: #000000;
+    position: absolute;
+    border-radius: 16px;
+    top: 2%;
+    left: 65%;
+    width: 34.6%;
+    height: 96%;
+}
+
+/* the main button class */
+.button {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 8px;
+    margin: 8px;
+    display: inline-block;
+    width: 128px;
+    height: 32px;
+    text-align: center;
+    line-height: 0px;
+    font-size: 20px;
+    font-family: "Montserrat";
+    transition: background-color 0.25s;
+}
+
+/* smaller buttons! */
+.button_small {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 8px;
+    margin: 8px;
+    margin-right: 1px;
+    display: inline-block;
+    width: 64px;
+    height: 32px;
+    text-align: center;
+    line-height: 0px;
+    font-size: 20px;
+    font-family: "Montserrat";
+    transition: background-color 0.25s;
+}
+
+/* the larger button class */
+.button_large {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 8px;
+    margin: 8px;
+    display: inline-block;
+    width: 100%;
+    height: 32px;
+    text-align: center;
+    line-height: 0px;
+    font-size: 20px;
+    font-family: "Montserrat";
+    transition: background-color 0.25s;
+}
+
+/* input bar for custom betting */
+.custom_bet_input {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 8px;
+    margin: 8px;
+    display: inline-block;
+    width: 180px;
+    height: 16px;
+    text-align: center;
+    line-height: 0px;
+    font-size: 20px;
+    font-family: "Montserrat";
+}
+
+/* card elements */
+.card {
+    width: 100px;
+    height: 150px;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin: 4px;
+    box-shadow: 0px 0px 5px black;
+    position: relative;
+    transition: all 0.1s ease-in-out, opacity 0.5s ease-in, right 0.5s ease-in-out;
+    top: 0px;
+    right: 0px;
+}
+
+.card:hover {
+    top: -10px;
+}

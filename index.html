@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blackjack Game</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    
+</head>
+
+<header>
+    <div class="title_div">
+        <h1> Blackjack Game</h1>
+    </div>
+    <div class="background_gradient" id="background_gradient"></div>  <!-- Background Gradient -->
+</header>
+
+<body>
+    <div class="playing_board">
+        <!-- Dealer section -->
+        <div class="dealers_hand_div">
+            <h2>Dealer's Hand</h2>
+        </div>
+        <div class="dealers_hand_container" id="dealers_hand_container">
+            
+        </div>
+        <div class="dealer_hand_value_div">
+            <p>Dealer's Hand Value: <span id="dealer_hand_value">0</span></p>
+        </div>
+        <div class="line_split_1"></div>  <!-- Line Split -->
+        <!-- Player section -->
+        <div class="players_hand_div">
+            <h2>Player's Hand</h2>
+        </div>
+        <div class="players_hands_extra" id="players_hands_extra"> <!-- for split hands -->
+            <div class="players_hand_container" id="players_hand_container"></div>
+        </div>
+        <div class="player_hand_value_div">
+            <p>Player's Hand Value: <span id="player_hand_value">0</span></p>
+        </div>
+    </div>
+    <!-- for your stats and stuff like betting -->  
+    <div class="game_div" id="game_div">
+        <p style="opacity: 0;">_</p>  <!-- for spacing, funny text! -->
+        <!-- action section -->
+        <div class="action_text"><p>Actions</p></div>
+        <div class="action_buttons">
+            <button class="button" id="hit_button" onclick="action_hit()">Hit</button>
+            <button class="button" id="stand_button" onclick="action_stand()">Stand</button>
+            <button class="button" id="double_button" onclick="action_double()">Double</button>
+            <button class="button" id="split_button" onclick="action_split()">Split</button>
+        </div>
+        <!-- betting section -->
+        <div class="betting_div">
+            <p>Betting</p>
+        </div>
+        <div class="betting_buttons"> <!-- betting buttons, most will be percent amounts -->
+            <button class="button_small" id="bet_5_percent_button" onclick="bet_5_percent()">5%</button>
+            <button class="button_small" id="bet_10_percent_button" onclick="bet_10_percent()">10%</button>
+            <button class="button_small" id="bet_25_percent_button" onclick="bet_25_percent()">25%</button>
+            <button class="button_small" id="bet_50_percent_button" onclick="bet_50_percent()">50%</button>
+        </div>
+        <div class="custom_bet">
+            <input class="custom_bet_input" type="number" id="custom_bet_input" placeholder="Custom Bet $">
+            <button class="button_small" id="custom_bet_button" onclick="set_custom_bet()">Bet</button>
+        </div>
+        <div class="bet_amount">
+            <p>Amount Bet: <span id="bet_amount">$0</span></p>
+            <p>Percent: <span id="bet_amount_percent">0%</span></p>
+        </div>
+        <!-- your bank section -->
+        <div class="bank_div">
+            <p>Bank</p>
+        </div>
+        <div class="bank_amount">
+            <p>Amount:<br><span id="money_amount">$1000</span></p>
+        </div>
+        <!-- game actions (start) section-->
+        <div class="game_actions_div">
+            <p>Game Actions</p>
+        </div>
+        <div class="gane_actions_buttons">
+            <button class="button_large" id="start_button" onclick="start_game()">Start Game</button>
+            <button class="button_large" id="reset_button" onclick="reset_game()">Reset All</button>
+        </div>
+        <!-- game message and status box -->
+        <div class="game_message_box" id="game_message_box">
+            <p id="game_message"> <!-- messy, but it works -->
+                <span id="game_message_1"> </span><br>
+                <span id="game_message_2"> </span><br>
+                <span id="game_message_3"> </span><br>
+                <span id="game_message_4"> </span><br>
+                <span id="game_message_5"> </span><br>
+                <span id="game_message_6"> </span><br>
+            </p>
+        </div>
+    </div>
+</body>
+
+<footer>
+    <script type="text/javascript" src="blackjack.js"></script>  <!-- blackjack script -->
+</footer>
