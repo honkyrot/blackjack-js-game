@@ -37,7 +37,20 @@ h2 {
 /* background div gradient */
 /* gradient is dymanic to show whos turn it is, here is a simple placeholder */
 .background_gradient {  
-    background: linear-gradient(to bottom, #00ff37, #000000);
+    background: linear-gradient(to bottom, #00ff00, #000000);
+    background-size: 400% 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -4;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.background_gradient_overlay {  
+    background: linear-gradient(to bottom, #ff0000, #000000);
     background-size: 400% 100%;
     position: fixed;
     top: 0;
@@ -45,6 +58,7 @@ h2 {
     width: 100%;
     height: 100%;
     z-index: -5;
+    opacity: 1;
 }
 
 .title_div {
@@ -60,9 +74,8 @@ h2 {
     background-color: rgba(100, 100, 100, 0.5);
     border-radius: 16px;
     padding: 2px;
-    left: 50%;
     height: 70%;
-    text-align: center;
+
 }
 
 .dealers_hand_div {
@@ -77,6 +90,10 @@ h2 {
     display: inline-block;
     width: fit-content;
     height: 150px;
+    position: relative;
+    left: 50%;
+    transition: left 0.5s ease-in-out;
+    translate: translateX(-50%);
 }
 
 /* dealer hand score */
@@ -99,9 +116,11 @@ h2 {
     background-color: rgba(0, 0, 0, 0);
     padding: 10px;
     margin: 2px;
-    display: inline-block;
-    width: 50%;
+    width: fit-content;
     height: 150px;
+    position: relative;
+    left: 50%;
+    transition: left 0.5s ease-in-out;
 }
 
 /* player hand score */
@@ -118,10 +137,12 @@ h2 {
 /* funny little line */
 .line_split_1 {
     background-color: #ffffff;
-    display: inline-block;
     border-radius: 5px;
     width: 50%;
     height: 10px;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
 }   
 
 /* your body for actions div */

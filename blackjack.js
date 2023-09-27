@@ -6,6 +6,8 @@
 let player_hand = [];
 let dealer_hand = [];
 let player_turn = true;
+let players_hand_count = 0; // for split
+let players_hand_current = 0; // for split
 
 //player variables
 let money = 1000;
@@ -70,6 +72,9 @@ const custom_bet_button = document.getElementById("custom_bet_button");
 
 const reset_button = document.getElementById("reset_button");
 const start_button = document.getElementById("start_button");
+
+const playing_board = document.getElementById("playing_board");
+const background_div = document.getElementById("background_gradient");
 
 //message ids woaw
 let messages = [];
@@ -195,11 +200,162 @@ function dealer_first_start() {
     player_score_text.innerHTML = player_score;
 
     split_check();
+    check_scores(true);
+}
+
+// quick function to update scores and text
+function update_gui() {
+    player_score_text.innerHTML = player_score;
+    money_amount_text.innerHTML = `Money: \$${money}`;
+
+    // dealer score check
+    if (dealer_hand.length == 2) {
+        dealer_score_text.innerHTML = dealer_hand[0].value + "?";
+    } else {
+        dealer_score_text.innerHTML = dealer_score;
+    }
+}
+
+// you lose
+function bust() {
+    push_message("You lost: \$" + bet);
+    game_over = true;
+    total_losses++;
+    money -= bet;
+    document.backgroundColor = "red";
+
+    deactivate_action_buttons();
+    activate_betting_buttons();
+    update_gui();
+    transition_red_background();
+}
+
+function check_ace(hand, score) {
+    if (score > 21) {
+        for (let i = 0; i < hand.length; i++) {
+            var card = hand[i];
+            if (hand[i].value == 11) {
+                hand[i].value = 1;
+                score -= 10;
+                update_gui();
+            }
+        }
+    }
+}
+
+// you win
+function player_win(multiplier = 1) {
+    push_message("You won: \$" + bet * multiplier);
+    game_over = true;
+    total_wins++;
+    money += bet * multiplier;
+    document.backgroundColor = "green";
+
+    deactivate_action_buttons();
+    activate_betting_buttons();
+    update_gui();
+}
+
+//push
+function push() {
+    push_message("You tied with the dealer! (push)");
+    game_over = true;
+}
+
+// checks the player's score
+function check_scores(first_check = false) {
+    check_ace(player_hand, player_score);
+    check_ace(dealer_hand, dealer_score);
+    if (player_score > 21) {
+        push_message("You busted!");
+        bust();
+    }
+    else if (player_score == 21) {
+        if (dealer_score != 21) {
+            if (first_check) {
+                push_message("You got Blackjack!");
+                player_win(1.5);  // pays 3:2
+            }
+            else
+            {
+                push_message("You got 21!");
+                player_win();
+            }
+        }
+        else
+        {
+            push();  // push when both players have 21
+        }
+    }
+
+    // dealer score check
+    if (dealer_score == 21 && first_check) {
+        push_message("Dealer got Blackjack!");
+        bust();
+    }
+    else if (dealer_score > 21) {
+        push_message("Dealer busted!");
+        player_win();
+    }
+}
+
+function check_final_scores() {
+    if (player_score > dealer_score) {
+        player_win();
+    }
+    else if (player_score < dealer_score) {
+        bust();
+    }
+    else {
+        push();
+    }
 }
 
 // hit function
 function action_hit() {
-    visualize_card(get_random_card(), player_hand_container); // test
+    var new_card = get_random_card();
+    visualize_card(new_card, player_hand_container);
+    player_hand.push(new_card);
+    player_score += new_card.value;
+
+    update_gui();
+    check_scores();
+    double_button.disabled = true;  // disable double button after first hit
+}
+
+// stand function
+function action_stand() {
+    player_turn = false;
+    dealer_turn();
+}
+
+function dealer_turn() {
+    // reveal dealer's first card
+    dealer_hand_container.innerHTML = "";
+    visualize_card(dealer_hand[0], dealer_hand_container);
+    visualize_card(dealer_hand[1], dealer_hand_container);
+    dealer_score_text.innerHTML = dealer_score;
+
+    if (dealer_score < 17) {
+        var cards_drawn = 0;
+        setTimeout(() => {
+            var new_card = get_random_card();
+            visualize_card(new_card, dealer_hand_container);
+            dealer_hand.push(new_card);
+            dealer_score += new_card.value;
+            update_gui();
+            check_scores();
+            cards_drawn++;
+        }, 1000 + (cards_drawn * 1000));
+    }
+
+    update_gui();
+
+    if (!game_over) {
+        setTimeout(() => {
+            check_final_scores();
+        }, 1000 + (cards_drawn * 1000));
+    }
 }
 
 // checks if the player has a split their hand
@@ -219,6 +375,8 @@ function visualize_card(card, container) {
     card_img.style.right = "-100px";
 
     container.appendChild(card_img);
+    var viewport_width = playing_board.clientWidth;
+    container.style.left = ((viewport_width / 2) - (container.childElementCount * 56)) - 12 + "px";
 
     setTimeout(() => {
         card_img.style.opacity = "1";
@@ -289,8 +447,11 @@ function reset_game() {
     game_over = false;
     player_score = 0;
     dealer_score = 0;
-    amount = 1000;
+    //amount = 1000;
     bet = 0;
+
+    dealer_hand_container.style.left = "50%";
+    player_hand_container.style.left = "50%";
 
     dealer_hand_container.innerHTML = "";
     player_hand_container.innerHTML = "";
@@ -298,7 +459,7 @@ function reset_game() {
     player_score_text.innerHTML = "";
     dealer_score_text.innerHTML = "";
 
-    bet_amount_text.innerHTML = "Bet Amount: \$0";
+    bet_amount_text.innerHTML = "\$0";
     bet_amount_percent_text.innerHTML = "Percent: 0%";
 
     money_amount_text.innerHTML = `Money: \$${money}`;
@@ -307,9 +468,19 @@ function reset_game() {
     activate_betting_buttons();
     start_button.disabled = false;
 
+    transition_green_background();
     push_message("Game restarted to default.");
 }
 
+// makes the background red
+function transition_red_background() {
+    background_div.style.opacity = "0";
+}
+
+// makes the background green
+function transition_green_background() {
+    background_div.style.opacity = "1";
+}
 
 // general start functions
 deactivate_action_buttons();
