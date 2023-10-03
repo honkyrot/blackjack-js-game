@@ -199,6 +199,8 @@ function dealer_first_start() {
 
     player_score_text.innerHTML = player_score;
 
+    check_ace(dealer_hand, dealer_score);
+    check_ace(player_hand, player_score);
     split_check();
     check_scores(true);
 }
@@ -303,7 +305,7 @@ function check_final_scores() {
     if (player_score > dealer_score) {
         player_win();
     }
-    else if (player_score < dealer_score) {
+    else if (player_score < dealer_score && dealer_score <= 21) {
         bust();
     }
     else {
@@ -329,6 +331,31 @@ function action_stand() {
     dealer_turn();
 }
 
+let cards_drawn = 0;
+
+function dealer_action() {
+    setTimeout(() => {
+        if (dealer_score < 17) {
+            var new_card = get_random_card();
+            visualize_card(new_card, dealer_hand_container);
+            dealer_hand.push(new_card);
+            dealer_score += new_card.value;
+            update_gui();
+            check_scores();
+            cards_drawn++;
+            dealer_action();
+        }
+        else
+        {
+            if (!game_over) {
+                setTimeout(() => {
+                    check_final_scores();
+                }, 1000);
+            }
+        }
+    }, 1000 + (cards_drawn * 1000));
+}
+
 function dealer_turn() {
     // reveal dealer's first card
     dealer_hand_container.innerHTML = "";
@@ -337,25 +364,11 @@ function dealer_turn() {
     dealer_score_text.innerHTML = dealer_score;
 
     if (dealer_score < 17) {
-        var cards_drawn = 0;
-        setTimeout(() => {
-            var new_card = get_random_card();
-            visualize_card(new_card, dealer_hand_container);
-            dealer_hand.push(new_card);
-            dealer_score += new_card.value;
-            update_gui();
-            check_scores();
-            cards_drawn++;
-        }, 1000 + (cards_drawn * 1000));
+        cards_drawn = 0;
+        dealer_action();
     }
 
     update_gui();
-
-    if (!game_over) {
-        setTimeout(() => {
-            check_final_scores();
-        }, 1000 + (cards_drawn * 1000));
-    }
 }
 
 // checks if the player has a split their hand
