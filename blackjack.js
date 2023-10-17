@@ -47,6 +47,7 @@ const card_deck = [
     {src:'spades-J.svg', value:10, suit:"spades"}, {src:'spades-Q.svg', value:10, suit:"spades"}, {src:'spades-K.svg', value:10, suit:"spades"},
     {src:'spades-A.svg', value:11, suit:"spades"}
 ];
+let temp_deck = [];
 const down_card = {src:'blue.svg', value:0, suit:"back"};
 
 //ids
@@ -127,6 +128,7 @@ function bet_50_percent() {
     set_bet(Math.floor(money * 0.5));
 }
 
+// sets your custom bet
 function set_custom_bet() {
     let custom_amount = custom_bet_input.value;
     if (custom_amount > money) {
@@ -134,6 +136,7 @@ function set_custom_bet() {
         return;
     }
     custom_amount = Math.floor(custom_amount);  // make sure its an integer
+    custom_amount = Math.abs(custom_amount);  // make sure its positive
     set_bet(custom_amount);
 }
 
@@ -141,14 +144,21 @@ function set_custom_bet() {
 
 // picks a random card from the deck
 function get_random_card() {
-    let random_card = Math.floor(Math.random() * card_deck.length);
-    let card = card_deck[random_card];
+    let random_card = Math.floor(Math.random() * temp_deck.length);
+    let card = temp_deck[random_card];
+
+    temp_deck.splice(random_card, 1);  // remove the card from the deck
 
     return card;
 }
 
 // starts the game
 function start_game() {
+    temp_deck = card_deck.slice();  // copy the deck to the temp deck
+
+    dealer_hand_container.innerHTML = "";
+    player_hand_container.innerHTML = "";
+
     if (game_active) {
         push_message("Game is already active!");
         return;
@@ -199,8 +209,9 @@ function dealer_first_start() {
 
     player_score_text.innerHTML = player_score;
 
-    check_ace(dealer_hand, dealer_score);
-    check_ace(player_hand, player_score);
+    check_ace(player_hand, player_score, true);
+    check_ace(dealer_hand, dealer_score, false);
+
     split_check();
     check_scores(true);
 }
@@ -211,11 +222,11 @@ function update_gui() {
     money_amount_text.innerHTML = `Money: \$${money}`;
 
     // dealer score check
-    if (dealer_hand.length == 2) {
-        dealer_score_text.innerHTML = dealer_hand[0].value + "?";
-    } else {
-        dealer_score_text.innerHTML = dealer_score;
-    }
+    //if (dealer_hand.length == 2) {
+    //    dealer_score_text.innerHTML = dealer_hand[0].value + "?";
+    //} else {
+    //    dealer_score_text.innerHTML = dealer_score;
+    //}
 }
 
 // you lose
@@ -232,14 +243,21 @@ function bust() {
     transition_red_background();
 }
 
-function check_ace(hand, score) {
+// check ace function
+function check_ace(hand, score, player = true) {
     if (score > 21) {
         for (let i = 0; i < hand.length; i++) {
             var card = hand[i];
             if (hand[i].value == 11) {
                 hand[i].value = 1;
-                score -= 10;
+                if (player) {
+                    player_score -= 10;
+                }
+                else{
+                    dealer_score -= 10;
+                }
                 update_gui();
+                console.log("Ace changed to 1 for someone." + player)
             }
         }
     }
@@ -261,13 +279,16 @@ function player_win(multiplier = 1) {
 //push
 function push() {
     push_message("You tied with the dealer! (push)");
+    deactivate_action_buttons();
+    activate_betting_buttons();
+    update_gui();
     game_over = true;
 }
 
 // checks the player's score
 function check_scores(first_check = false) {
-    check_ace(player_hand, player_score);
-    check_ace(dealer_hand, dealer_score);
+    check_ace(player_hand, player_score, true);
+    check_ace(dealer_hand, dealer_score, false);
     if (player_score > 21) {
         push_message("You busted!");
         bust();
@@ -301,7 +322,12 @@ function check_scores(first_check = false) {
     }
 }
 
+var reset_able = true;
+
+// checks the final scores
 function check_final_scores() {
+    reset_able = true;
+    dealer_score_text.innerHTML = dealer_score;
     if (player_score > dealer_score) {
         player_win();
     }
@@ -328,12 +354,15 @@ function action_hit() {
 // stand function
 function action_stand() {
     player_turn = false;
+    dealer_score_text.innerHTML = dealer_score;
     dealer_turn();
 }
 
 let cards_drawn = 0;
 
+// dealer action function
 function dealer_action() {
+    dealer_score_text.innerHTML = dealer_score;
     setTimeout(() => {
         if (dealer_score < 17) {
             var new_card = get_random_card();
@@ -353,9 +382,10 @@ function dealer_action() {
                 }, 1000);
             }
         }
-    }, 1000 + (cards_drawn * 1000));
+    }, (1000));
 }
 
+// dealer turn function
 function dealer_turn() {
     // reveal dealer's first card
     dealer_hand_container.innerHTML = "";
@@ -366,6 +396,9 @@ function dealer_turn() {
     if (dealer_score < 17) {
         cards_drawn = 0;
         dealer_action();
+    }
+    else{
+        check_final_scores();
     }
 
     update_gui();
@@ -454,35 +487,41 @@ function deactivate_betting_buttons() {
 
 // resets the game
 function reset_game() {
-    player_hand = [];
-    dealer_hand = [];
-    player_turn = true;
-    game_over = false;
-    player_score = 0;
-    dealer_score = 0;
-    //amount = 1000;
-    bet = 0;
+    if (reset_able || game_over) {
+        reset_able = false
 
-    dealer_hand_container.style.left = "50%";
-    player_hand_container.style.left = "50%";
+        player_hand = [];
+        dealer_hand = [];
+        player_turn = true;
+        game_over = false;
+        player_score = 0;
+        dealer_score = 0;
+        //amount = 1000;
+        bet = 0;
 
-    dealer_hand_container.innerHTML = "";
-    player_hand_container.innerHTML = "";
+        dealer_hand_container.style.left = "50%";
+        player_hand_container.style.left = "50%";
 
-    player_score_text.innerHTML = "";
-    dealer_score_text.innerHTML = "";
+        dealer_hand_container.innerHTML = "";
+        player_hand_container.innerHTML = "";
 
-    bet_amount_text.innerHTML = "\$0";
-    bet_amount_percent_text.innerHTML = "Percent: 0%";
+        player_score_text.innerHTML = "";
+        dealer_score_text.innerHTML = "";
 
-    money_amount_text.innerHTML = `Money: \$${money}`;
+        bet_amount_text.innerHTML = "\$0";
+        bet_amount_percent_text.innerHTML = "Percent: 0%";
 
-    deactivate_action_buttons();
-    activate_betting_buttons();
-    start_button.disabled = false;
+        money_amount_text.innerHTML = `Money: \$${money}`;
 
-    transition_green_background();
-    push_message("Game restarted to default.");
+        deactivate_action_buttons();
+        activate_betting_buttons();
+        start_button.disabled = false;
+
+        transition_green_background();
+        push_message("Game restarted to default.");
+
+        temp_deck = [];  // empties the temp deck
+    }
 }
 
 // makes the background red
