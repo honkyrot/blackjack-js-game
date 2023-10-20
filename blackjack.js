@@ -149,6 +149,8 @@ function get_random_card() {
 
     temp_deck.splice(random_card, 1);  // remove the card from the deck
 
+    console.log(card, temp_deck.length)
+
     return card;
 }
 
@@ -246,11 +248,13 @@ function bust() {
 // check ace function
 function check_ace(hand, score, player = true) {
     if (score > 21) {
+        //console.log(dealer_hand, player_hand)
         for (let i = 0; i < hand.length; i++) {
             var card = hand[i];
-            if (hand[i].value == 11) {
-                hand[i].value = 1;
-                if (player) {
+            if (card.value == 11) {
+                card.value = 1;
+                console.log(card_deck)
+                if (player) {  // subtract 10 from the player's score
                     player_score -= 10;
                 }
                 else{
@@ -355,6 +359,9 @@ function action_hit() {
 function action_stand() {
     player_turn = false;
     dealer_score_text.innerHTML = dealer_score;
+
+    deactivate_action_buttons();
+
     dealer_turn();
 }
 
@@ -509,7 +516,7 @@ function reset_game() {
         dealer_score_text.innerHTML = "";
 
         bet_amount_text.innerHTML = "\$0";
-        bet_amount_percent_text.innerHTML = "Percent: 0%";
+        bet_amount_percent_text.innerHTML = "0%";
 
         money_amount_text.innerHTML = `Money: \$${money}`;
 
