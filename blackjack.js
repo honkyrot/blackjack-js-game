@@ -317,7 +317,11 @@ function check_scores(first_check = false) {
 
     // dealer score check
     if (dealer_score == 21 && first_check) {
+        // if dealer got blackjack on first check, end the game and show the dealer's hand
         push_message("Dealer got Blackjack!");
+        dealer_hand_container.innerHTML = "";
+        visualize_card(dealer_hand[0], dealer_hand_container);
+        visualize_card(dealer_hand[1], dealer_hand_container);
         bust();
     }
     else if (dealer_score > 21) {
