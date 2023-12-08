@@ -47,6 +47,7 @@ const card_deck = [
     {src:'spades-J.svg', value:10, suit:"spades"}, {src:'spades-Q.svg', value:10, suit:"spades"}, {src:'spades-K.svg', value:10, suit:"spades"},
     {src:'spades-A.svg', value:11, suit:"spades"}
 ];
+
 let temp_deck = [];
 const down_card = {src:'blue.svg', value:0, suit:"back"};
 
@@ -111,7 +112,7 @@ function set_bet(amount) {
     bet_amount_percent_text.innerHTML = `${Math.floor((bet / money) * 100)}%`;
 }
 
-// betting functions
+// quick betting functions
 function bet_5_percent() {
     set_bet(Math.floor(money * 0.05));
 }
@@ -126,6 +127,14 @@ function bet_25_percent() {
 
 function bet_50_percent() {
     set_bet(Math.floor(money * 0.5));
+}
+
+function bet_75_percent() {
+    set_bet(Math.floor(money * 0.75));
+}
+
+function bet_100_percent() {
+    set_bet(Math.floor(money));
 }
 
 // sets your custom bet
@@ -156,7 +165,8 @@ function get_random_card() {
 
 // starts the game
 function start_game() {
-    temp_deck = card_deck.slice();  // copy the deck to the temp deck
+    // temp_deck = card_deck.slice();  // copy the deck to the temp deck
+    temp_deck = structuredClone(card_deck);  // copy the deck to the temp deck, new method
 
     dealer_hand_container.innerHTML = "";
     player_hand_container.innerHTML = "";
@@ -293,6 +303,7 @@ function push() {
 function check_scores(first_check = false) {
     check_ace(player_hand, player_score, true);
     check_ace(dealer_hand, dealer_score, false);
+    
     if (player_score > 21) {
         push_message("You busted!");
         bust();
@@ -320,8 +331,13 @@ function check_scores(first_check = false) {
         // if dealer got blackjack on first check, end the game and show the dealer's hand
         push_message("Dealer got Blackjack!");
         dealer_hand_container.innerHTML = "";
-        visualize_card(dealer_hand[0], dealer_hand_container);
-        visualize_card(dealer_hand[1], dealer_hand_container);
+        setTimeout(() => {
+            dealer_hand_container.innerHTML = "";
+            visualize_card(dealer_hand[0], dealer_hand_container);
+            visualize_card(dealer_hand[1], dealer_hand_container);
+            dealer_score_text.innerHTML = dealer_score;
+        }, 400);
+        
         bust();
     }
     else if (dealer_score > 21) {
