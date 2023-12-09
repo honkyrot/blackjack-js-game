@@ -10,19 +10,28 @@ let players_hand_count = 0; // for split
 let players_hand_current = 0; // for split
 
 //player variables
-let money = 1000;
+let money = 10000;
 let bet = 0;
+let bet_percent = 0;
 
 //gameplay variables
 let game_active = false;
 let game_over = false;
 let player_score = 0;
 let dealer_score = 0;
+let automatic_bet = false;  // if true, the bet will be automatically set to the last bet percentage
+
+// deck settings
+let infinite_deck = true;  // if true, the game will use an infinite deck, voiding the card counting system
+let deck_count = 1;  // how many decks to use, only works if infinite_deck is false
+let deck_count_max = 8;  // max amount of decks to use, only works if infinite_deck is false
 
 //misc variables
 let total_resets = 0;
 let total_wins = 0;
+let total_pushes = 0;
 let total_losses = 0;
+let total_banruptcy = 0;  // when you lose all your money
 
 //card deck objects!
 const card_deck = [
@@ -60,6 +69,7 @@ const bet_amount_text = document.getElementById("bet_amount");
 const bet_amount_percent_text = document.getElementById("bet_amount_percent");
 const money_amount_text = document.getElementById("money_amount");
 const custom_bet_input = document.getElementById("custom_bet_input");
+const automatic_bet_text = document.getElementById("automatic_betting_text");
 
 const hit_button = document.getElementById("hit_button");
 const stand_button = document.getElementById("stand_button");
@@ -70,6 +80,8 @@ const bet_5_percent_button = document.getElementById("bet_5_percent_button");
 const bet_10_percent_button = document.getElementById("bet_10_percent_button");
 const bet_25_percent_button = document.getElementById("bet_25_percent_button");
 const bet_50_percent_button = document.getElementById("bet_50_percent_button");
+const bet_75_percent_button = document.getElementById("bet_75_percent_button");
+const bet_100_percent_button = document.getElementById("bet_100_percent_button");
 const custom_bet_button = document.getElementById("custom_bet_button");
 
 const reset_button = document.getElementById("reset_button");
@@ -77,6 +89,13 @@ const start_button = document.getElementById("start_button");
 
 const playing_board = document.getElementById("playing_board");
 const background_div = document.getElementById("background_gradient");
+
+const stats_games_played = document.getElementById("games_played");
+const stats_wins = document.getElementById("games_won");
+const stats_losses = document.getElementById("games_lost");
+const stats_pushes = document.getElementById("games_pushed");
+const stats_win_percent = document.getElementById("win_percentage");
+const stats_banruptcy = document.getElementById("banruptcy_count");
 
 //message ids woaw
 let messages = [];
@@ -110,31 +129,41 @@ function set_bet(amount) {
     push_message(`Bet set to \$${bet}`);
     bet_amount_text.innerHTML = `\$${bet}`;
     bet_amount_percent_text.innerHTML = `${Math.floor((bet / money) * 100)}%`;
+
+    if (automatic_bet) {
+        automatic_bet_text.innerHTML = `Automatic Betting: (${bet_percent}%)`;
+    }
 }
 
 // quick betting functions
 function bet_5_percent() {
+    bet_percent = 5;
     set_bet(Math.floor(money * 0.05));
 }
 
 function bet_10_percent() {
+    bet_percent = 10;
     set_bet(Math.floor(money * 0.1));
 }
 
 function bet_25_percent() {
+    bet_percent = 25;
     set_bet(Math.floor(money * 0.25));
 }
 
 function bet_50_percent() {
+    bet_percent = 50;
     set_bet(Math.floor(money * 0.5));
 }
 
 function bet_75_percent() {
+    bet_percent = 75;
     set_bet(Math.floor(money * 0.75));
 }
 
 function bet_100_percent() {
-    set_bet(Math.floor(money));
+    bet_percent = 100;
+    set_bet(money);
 }
 
 // sets your custom bet
@@ -165,6 +194,8 @@ function get_random_card() {
 
 // starts the game
 function start_game() {
+    total_resets++;  // add to the total resets
+
     // temp_deck = card_deck.slice();  // copy the deck to the temp deck
     temp_deck = structuredClone(card_deck);  // copy the deck to the temp deck, new method
 
@@ -231,7 +262,7 @@ function dealer_first_start() {
 // quick function to update scores and text
 function update_gui() {
     player_score_text.innerHTML = player_score;
-    money_amount_text.innerHTML = `Money: \$${money}`;
+    money_amount_text.innerHTML = `\$${money.toLocaleString()}`;
 
     // dealer score check
     //if (dealer_hand.length == 2) {
@@ -239,6 +270,14 @@ function update_gui() {
     //} else {
     //    dealer_score_text.innerHTML = dealer_score;
     //}
+
+    // update stats
+    stats_games_played.innerHTML = total_resets;
+    stats_wins.innerHTML = total_wins;
+    stats_losses.innerHTML = total_losses;
+    stats_pushes.innerHTML = total_pushes;
+    stats_win_percent.innerHTML = `${Math.floor((total_wins / total_resets) * 100)}%`;
+    stats_banruptcy.innerHTML = total_banruptcy;
 }
 
 // you lose
@@ -296,6 +335,7 @@ function push() {
     deactivate_action_buttons();
     activate_betting_buttons();
     update_gui();
+    total_pushes++;
     game_over = true;
 }
 
@@ -406,7 +446,7 @@ function dealer_action() {
             if (!game_over) {
                 setTimeout(() => {
                     check_final_scores();
-                }, 1000);
+                }, 100);
             }
         }
     }, (1000));
@@ -489,12 +529,16 @@ function activate_betting_buttons() {
     bet_10_percent_button.disabled = false;
     bet_25_percent_button.disabled = false;
     bet_50_percent_button.disabled = false;
+    bet_75_percent_button.disabled = false;
+    bet_100_percent_button.disabled = false;
     custom_bet_button.disabled = false;
 
-    bet_5_percent_button.style.backgroundColor = "white";
-    bet_10_percent_button.style.backgroundColor = "white";
+    bet_5_percent_button.style.backgroundColor = "rgb(100, 100, 255)";
+    bet_10_percent_button.style.backgroundColor = "rgb(127, 127, 255)";
     bet_25_percent_button.style.backgroundColor = "white";
     bet_50_percent_button.style.backgroundColor = "white";
+    bet_75_percent_button.style.backgroundColor = "rgb(255, 127, 127)";
+    bet_100_percent_button.style.backgroundColor = "rgb(255, 0, 0)";
     custom_bet_button.style.backgroundColor = "white";
 }
 
@@ -503,13 +547,28 @@ function deactivate_betting_buttons() {
     bet_10_percent_button.disabled = true;
     bet_25_percent_button.disabled = true;
     bet_50_percent_button.disabled = true;
+    bet_75_percent_button.disabled = true;
+    bet_100_percent_button.disabled = true;
     custom_bet_button.disabled = true;
 
     bet_5_percent_button.style.backgroundColor = "gray";
     bet_10_percent_button.style.backgroundColor = "gray";
     bet_25_percent_button.style.backgroundColor = "gray";
     bet_50_percent_button.style.backgroundColor = "gray";
+    bet_75_percent_button.style.backgroundColor = "gray";
+    bet_100_percent_button.style.backgroundColor = "gray";
     custom_bet_button.style.backgroundColor = "gray";
+}
+
+function automatic_bet_toggle() {
+    automatic_bet = !automatic_bet;
+    if (automatic_bet) {
+        push_message("Automatic bet enabled.");
+    }
+    else
+    {
+        push_message("Automatic bet disabled.");
+    }
 }
 
 // resets the game
@@ -538,7 +597,7 @@ function reset_game() {
         bet_amount_text.innerHTML = "\$0";
         bet_amount_percent_text.innerHTML = "0%";
 
-        money_amount_text.innerHTML = `Money: \$${money}`;
+        money_amount_text.innerHTML = `\$${money.toLocaleString()}`;
 
         deactivate_action_buttons();
         activate_betting_buttons();
@@ -548,6 +607,26 @@ function reset_game() {
         push_message("Game restarted to default.");
 
         temp_deck = [];  // empties the temp deck
+
+        // automatic bet
+        if (automatic_bet) {
+            if (bet_percent == 0) {
+            }
+            else
+            {
+                set_bet(Math.floor(money * (bet_percent / 100)));
+            }
+        }
+        
+        // if player broke, give them a small grant and reset, also give them a banruptcy stat
+        if (money <= 0) {
+            push_message("You're broke! Game over.");
+            push_message("You get a small grant of \$10,000 to start over.");
+            money = 10000;
+            total_banruptcy++;
+        }
+
+        update_gui();
     }
 }
 

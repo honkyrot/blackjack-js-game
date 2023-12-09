@@ -160,6 +160,7 @@ h2 {
     background-color: rgba(100, 100, 100, 0.5);
     position: relative;
     top: 10px;
+
     border-radius: 16px;
     height: 25%;
 }
@@ -170,11 +171,18 @@ h2 {
     top: 0%;
 }
 
-/* the betting part, (no real money involved) */
-.betting_div {
+/* the automatic betting part, a switch */
+.automatic_betting {
     position: absolute;
-    top: 0%;    
-    left: 15%;
+    top: 87%;    
+    left: 15.5%;
+}
+
+/* the automatic betting text */
+.automatic_betting_text {
+    position: absolute;
+    top: 80.5%;    
+    left: 17%;
 }
 
 /* container for buttons */ 
@@ -188,8 +196,18 @@ h2 {
     flex-direction: row;
     display: flex;
     position: absolute;
-    top: 15%;
+    top: 0%;
     left: 15%;
+}
+
+/* container for BETTING buttons (high risk) */
+.betting_buttons_damger {
+    flex-direction: row;
+    display: flex;
+    position: absolute;
+    top: 18%;
+    left: 15%;
+
 }
 
 /* div for custom betting inputs */
@@ -325,4 +343,42 @@ h2 {
 
 .card:hover {
     top: -10px;
+}
+
+/* game status div */
+.game_stats {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+}
+
+/* game status dropdown button, also does the menu */
+.game_stats:hover .game_stats_dropdown {
+    display: block;
+}
+
+/* game status dropdown */
+.game_stats_dropdown{
+    background-color: #000000;
+    border-radius: 16px;
+    padding: 8px;
+    margin: 8px;
+    font-size: 20px;
+    font-family: "Montserrat";
+    display: none;
+}
+
+/* game status dropdown button */
+.game_stats_dropdown_button {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 8px;
+    margin: 8px;
+    display: inline-block;
+    width: 160px;
+    height: 32px;
+    text-align: center;
+    line-height: 0px;
+    font-size: 20px;
+    font-family: "Montserrat";
 }

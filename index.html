@@ -13,6 +13,20 @@
     </div>
     <div class="background_gradient" id="background_gradient"></div>  <!-- Background Gradient -->
     <div class="background_gradient_overlay" id="background_gradient_overlay"></div>  <!-- Background Gradient 2 hacky thing -->
+
+    
+    <div class="game_stats">
+        <button class="game_stats_dropdown_button">Game Stats</button>
+        <div class="game_stats_dropdown">
+            <p>Played: <span id="games_played">0</span></p>
+            <p>Won: <span id="games_won">0</span></p>
+            <p>Lost: <span id="games_lost">0</span></p>
+            <p>Pushed: <span id="games_pushed">0</span></p>
+            <p>Win Percentage: <span id="win_percentage">0%</span></p>
+            <p>Bankruptcies: <span id="banruptcy_count">0</span></p>
+        </div>
+    </div>
+
 </header>
 
 <body>
@@ -55,19 +69,38 @@
             <button class="button" id="split_button" onclick="action_split()">Split</button>
         </div>
         <!-- betting section -->
-        <div class="betting_div">
-            <p>Betting</p>
+
+        <!-- automatic betting switch, for those who don't want to keep betting -->
+        <div class="automatic_betting">
+            <label class="automatic_bet_toggle" title="Automatic betting, set's whatever percent to bet per reset.">
+                <input type="checkbox" id="automatic_bet_toggle" onclick="automatic_bet_toggle()">
+            </label>
         </div>
-        <div class="betting_buttons"> <!-- betting buttons, most will be percent amounts -->
-            <button class="button_small" id="bet_5_percent_button" onclick="bet_5_percent()">5%</button>
-            <button class="button_small" id="bet_10_percent_button" onclick="bet_10_percent()">10%</button>
-            <button class="button_small" id="bet_25_percent_button" onclick="bet_25_percent()">25%</button>
-            <button class="button_small" id="bet_50_percent_button" onclick="bet_50_percent()">50%</button>
+
+        <div class="automatic_betting_text">
+            <p id="automatic_betting_text" title="Automatic betting, set's whatever percent to bet per reset.">Automatic Betting (0%)</p>
         </div>
+        
+        <!-- betting buttons, most will be percent amounts -->
+        <div class="betting_buttons"> 
+            <button class="button_small" title="Safe." id="bet_5_percent_button" onclick="bet_5_percent()">5%</button>
+            <button class="button_small" title="A little less safe." id="bet_10_percent_button" onclick="bet_10_percent()">10%</button>
+            <button class="button_small" title="Reasonable bet." id="bet_25_percent_button" onclick="bet_25_percent()">25%</button>
+        </div>
+
+        <!-- high risk betting buttons -->
+        <div class="betting_buttons_damger">
+            <button class="button_small" title="The most used button when testing. Theres just something about 50%" id="bet_50_percent_button" onclick="bet_50_percent()">50%</button>
+            <button class="button_small" title="Thats a high risk investment." id="bet_75_percent_button" onclick="bet_75_percent()">75%</button>
+            <button class="button_small" title="ALL IN?" id="bet_100_percent_button" onclick="bet_100_percent()">100%</button>
+        </div>
+
+        <!-- custom bet input and button -->
         <div class="custom_bet">
             <input class="custom_bet_input" type="number" id="custom_bet_input" placeholder="Custom Bet $">
-            <button class="button_small" id="custom_bet_button" onclick="set_custom_bet()">Bet</button>
+            <button class="button_small" title="custom bet" id="custom_bet_button" onclick="set_custom_bet()">Bet</button>
         </div>
+
         <div class="bet_amount">
             <p>Amount Bet: <span id="bet_amount">$0</span></p>
             <p>Percent: <span id="bet_amount_percent">0%</span></p>
@@ -77,7 +110,7 @@
             <p>Your money</p>
         </div>
         <div class="bank_amount">
-            <p>Amount:<br><span id="money_amount">$1000</span></p>
+            <p><span id="money_amount">$10,000</span></p>
         </div>
         <!-- game actions (start) section-->
         <div class="game_actions_div">
@@ -90,12 +123,12 @@
         <!-- game message and status box -->
         <div class="game_message_box" id="game_message_box">
             <p id="game_message"> <!-- messy, but it works -->
-                <span id="game_message_1"> </span><br>
-                <span id="game_message_2"> </span><br>
-                <span id="game_message_3"> </span><br>
-                <span id="game_message_4"> </span><br>
-                <span id="game_message_5"> </span><br>
-                <span id="game_message_6"> </span><br>
+                <span id="game_message_1" style="color: #ffffff;"> </span><br>
+                <span id="game_message_2" style="color: #dbdbdb;"> </span><br>
+                <span id="game_message_3" style="color: #b9b9b9;"> </span><br>
+                <span id="game_message_4" style="color: #999999;"> </span><br>
+                <span id="game_message_5" style="color: #727272;"> </span><br>
+                <span id="game_message_6" style="color: #5f5f5f;"> </span><br>
             </p>
         </div>
     </div>
