@@ -551,7 +551,6 @@ function visualize_card(card, container) {
         card_img.style.opacity = "1";
         card_img.style.right = "0px";
     }, 50);
-
 }
 
 // activation functions
@@ -756,6 +755,7 @@ function card_counting_toggle() {
     }
 }
 
+// custom amount settings
 var custom_starting_amount = false;
 function starting_amount_toggle() {
     if (custom_starting_amount) {
