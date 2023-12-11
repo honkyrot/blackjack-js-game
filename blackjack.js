@@ -11,6 +11,7 @@ let players_hand_current = 0; // for split
 
 //player variables
 let money = 10000;
+let starting_money = 10000;
 let bet = 0;
 let bet_percent = 0;
 
@@ -104,10 +105,13 @@ const stats_dropdown_panel = document.getElementById("game_stats_dropdown_panel"
 
 const game_settings_dropdown_panel = document.getElementById("game_settings_dropdown");
 const game_card_settings = document.getElementById("game_card_settings");
+const game_starting_amount_div = document.getElementById("starting_amount_div");
+// more constants in data_export.js for data exporting
+
 
 //message ids woaw
 let messages = [];
-let message_max_length = 6;
+let message_max_length = 7;
 
 for (let i = 1; i <= message_max_length; i++) {
     messages[i] = document.getElementById(`game_message_${i}`);
@@ -126,16 +130,16 @@ function sleep(milliseconds) {
 //push a message to the output box, max 7 messages
 function push_message(message) {
     for (let i = message_max_length; i >= 2; i--) {
-        messages[i].innerHTML = messages[i - 1].innerHTML;
+        messages[i].innerHTML = messages[i - 1].innerHTML.toLocaleString();
     }
-    messages[1].innerHTML = message;
+    messages[1].innerHTML = message.toLocaleString();
 }
 
 // sets the bets
 function set_bet(amount) {
     bet = amount;
     push_message(`Bet set to \$${bet}`);
-    bet_amount_text.innerHTML = `\$${bet}`;
+    bet_amount_text.innerHTML = `\$${bet.toLocaleString()}`;
     bet_amount_percent_text.innerHTML = `${Math.floor((bet / money) * 100)}%`;
 
     if (automatic_bet) {
@@ -202,6 +206,7 @@ function animate_money(obj, start, end, duration) {
 
 // set money
 function set_money(amount) {
+    money = 0;
     animate_money(money_amount_text, money, money + amount, 500);
     money = amount;
     money = Math.round(money);
@@ -223,7 +228,7 @@ function get_random_card() {
 
     temp_deck.splice(random_card, 1);  // remove the card from the deck
 
-    console.log(card, temp_deck.length)
+    //console.log(card, temp_deck.length)
 
     return card;
 }
@@ -340,7 +345,7 @@ function check_ace(hand, score, player = true) {
             var card = hand[i];
             if (card.value == 11) {
                 card.value = 1;
-                console.log(card_deck)
+                //console.log(card_deck)
                 if (player) {  // subtract 10 from the player's score
                     player_score -= 10;
                 }
@@ -349,7 +354,7 @@ function check_ace(hand, score, player = true) {
                 }
                 temp_score -= 10;
                 update_gui();
-                console.log("Ace changed to 1 for someone." + player)
+                //console.log("Ace changed to 1 for someone." + player)
                 break;
             }
         }
@@ -668,7 +673,7 @@ function reset_game() {
             push_message("You're broke! Game over.");
             push_message("You get a small grant of \$10,000 to start over.");
             //money = 10000;
-            set_money(10000);
+            set_money(starting_money);
             total_banruptcy++;
         }
 
@@ -680,6 +685,11 @@ function reset_game() {
             {
                 set_bet(Math.floor(money * (bet_percent / 100)));
             }
+        }
+
+        // if data saving is enabled, call the data saving function
+        if (data_save) {
+            save_current_data_entry();  
         }
 
         update_gui();
@@ -744,6 +754,31 @@ function card_counting_toggle() {
         push_message("∞ deck disabled.");
         game_card_settings.style = "display: block;";
     }
+}
+
+var custom_starting_amount = false;
+function starting_amount_toggle() {
+    if (custom_starting_amount) {
+        game_starting_amount_div.style = "display: none;";
+    }
+    else
+    {
+        game_starting_amount_div.style = "display: block;";
+    }
+    custom_starting_amount = !custom_starting_amount;
+}
+
+// for some inputs that need to save
+function apply_game_settings() {
+    push_message("Game settings applied.");
+
+    // deck
+    // wip
+
+    // starting money
+    starting_money = document.getElementById("starting_amount_input").value;
+    starting_money = Math.floor(starting_money);
+    set_money(starting_money);
 }
 
 // general start functions

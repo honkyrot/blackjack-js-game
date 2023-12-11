@@ -30,17 +30,41 @@
     </div>
 
     <!-- game setting and card counting -->
-    <div class="game_settings" style="display: none;">
+    <div class="game_settings">
         <button class="game_setting_button" id="game_setting_button" onclick="toggle_game_panel()">Game Settings</button>
         <div class="game_settings_dropdown" id="game_settings_dropdown">
+
             <!-- card deck and counting -->
             <div class="game_settings_1" title="If the game will have a set deck size (2-8 deck size of 52 cards)">
                 <p id="setting_limited_deck">
                     <input type="checkbox" id="card_counting_toggle" onclick="card_counting_toggle()">
-                    Finite Deck
+                    Finite Deck (wip)
                 </p>
                 <div class="game_card_settings" id="game_card_settings">
                     <p>Deck Size: <input class="deck_custom_size" type="number" id="custom_deck_input" placeholder="2-8" value="2"></p>
+                </div>
+            </div>
+
+            <!-- data saving -->
+            <div class="game_settings_2" title="Enable this to start saving data.">
+                <p id="setting_data_visualization">
+                    <input type="checkbox" id="data_visualization_toggle" onclick="data_save_toggle()">
+                    CSV Data Saving
+                </p>
+                <div class="game_card_settings" id="export_data_div">
+                    <button class="game_setting_button" style="border-radius: 8px;" id="export_data_button" onclick="export_data_csv()">Export Data</button>
+                    <p><span id="game_data_current_entries_text">0 entries</span></p>
+                </div>
+            </div>
+
+            <!-- custom starting amount -->
+            <div class="game_settings_3" title="Set the starting amount of money you have. (cheat)">
+                <p id="setting_starting_amount"> 
+                    <input type="checkbox" id="starting_amount_toggle" onclick="starting_amount_toggle()">
+                    Custom Starting Amount
+                </p>
+                <div class="game_card_settings" id="starting_amount_div">
+                    <p>Starting Amount: <input class="starting_amount_input" type="number" id="starting_amount_input" placeholder="0" value="10000"></p>
                 </div>
             </div>
 
@@ -159,11 +183,12 @@
         <div class="game_message_box" id="game_message_box">
             <p id="game_message"> <!-- messy, but it works -->
                 <span id="game_message_1" style="color: #ffffff;"> </span><br>
-                <span id="game_message_2" style="color: #dbdbdb;"> </span><br>
-                <span id="game_message_3" style="color: #b9b9b9;"> </span><br>
-                <span id="game_message_4" style="color: #999999;"> </span><br>
-                <span id="game_message_5" style="color: #727272;"> </span><br>
-                <span id="game_message_6" style="color: #5f5f5f;"> </span><br>
+                <span id="game_message_2" style="color: #e8e8e8;"> </span><br>
+                <span id="game_message_3" style="color: #d5d5d5;"> </span><br>
+                <span id="game_message_4" style="color: #b8b8b8;"> </span><br>
+                <span id="game_message_5" style="color: #a9a9a9;"> </span><br>
+                <span id="game_message_6" style="color: #898989;"> </span><br>
+                <span id="game_message_7" style="color: #787878;"> </span><br>
             </p>
         </div>
     </div>
@@ -171,4 +196,5 @@
 
 <footer>
     <script type="text/javascript" src="blackjack.js"></script> <!-- blackjack script -->
+    <script type="text/javascript" src="data_export.js"></script> <!-- data script -->
 </footer>

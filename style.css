@@ -466,3 +466,14 @@ h2 {
 .game_card_settings {
     display: none;
 }
+
+.starting_amount_input {
+    background-color: #ffffff;
+    border-radius: 16px;
+    width: 200px;
+    height: 24px;
+    text-align: center;
+    line-height: 0px;
+    font-size: 20px;
+    font-family: "Montserrat";
+}
