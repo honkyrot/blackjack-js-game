@@ -75,6 +75,7 @@ const hit_button = document.getElementById("hit_button");
 const stand_button = document.getElementById("stand_button");
 const double_button = document.getElementById("double_button");
 const split_button = document.getElementById("split_button");
+const surrender_button = document.getElementById("surrender_button");
 
 const bet_5_percent_button = document.getElementById("bet_5_percent_button");
 const bet_10_percent_button = document.getElementById("bet_10_percent_button");
@@ -89,6 +90,8 @@ const start_button = document.getElementById("start_button");
 
 const playing_board = document.getElementById("playing_board");
 const background_div = document.getElementById("background_gradient");
+const background_div_loss = document.getElementById("background_gradient_overlay_loss");
+const background_div_win = document.getElementById("background_gradient_overlay_win");
 
 const stats_games_played = document.getElementById("games_played");
 const stats_wins = document.getElementById("games_won");
@@ -96,6 +99,11 @@ const stats_losses = document.getElementById("games_lost");
 const stats_pushes = document.getElementById("games_pushed");
 const stats_win_percent = document.getElementById("win_percentage");
 const stats_banruptcy = document.getElementById("banruptcy_count");
+const stats_dropdown_button = document.getElementById("game_stats_dropdown_button");
+const stats_dropdown_panel = document.getElementById("game_stats_dropdown_panel");
+
+const game_settings_dropdown_panel = document.getElementById("game_settings_dropdown");
+const game_card_settings = document.getElementById("game_card_settings");
 
 //message ids woaw
 let messages = [];
@@ -176,6 +184,34 @@ function set_custom_bet() {
     custom_amount = Math.floor(custom_amount);  // make sure its an integer
     custom_amount = Math.abs(custom_amount);  // make sure its positive
     set_bet(custom_amount);
+}
+
+// animate money
+function animate_money(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = "\$" + Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
+
+// set money
+function set_money(amount) {
+    animate_money(money_amount_text, money, money + amount, 500);
+    money = amount;
+    money = Math.round(money);
+}
+
+// increment money instead of setting it
+function increment_money(amount) {
+    animate_money(money_amount_text, money, money + amount, 500);
+    money += amount;
+    money = Math.round(money);
 }
 
 // game functions
@@ -285,18 +321,20 @@ function bust() {
     push_message("You lost: \$" + bet);
     game_over = true;
     total_losses++;
-    money -= bet;
+    //money -= bet;
+    increment_money(-bet);
     document.backgroundColor = "red";
 
     deactivate_action_buttons();
     activate_betting_buttons();
     update_gui();
-    transition_red_background();
+    transition_loss_background();
 }
 
 // check ace function
 function check_ace(hand, score, player = true) {
-    if (score > 21) {
+    var temp_score = score; // in case theres multiple aces
+    if (temp_score > 21) {
         //console.log(dealer_hand, player_hand)
         for (let i = 0; i < hand.length; i++) {
             var card = hand[i];
@@ -309,8 +347,10 @@ function check_ace(hand, score, player = true) {
                 else{
                     dealer_score -= 10;
                 }
+                temp_score -= 10;
                 update_gui();
                 console.log("Ace changed to 1 for someone." + player)
+                break;
             }
         }
     }
@@ -321,11 +361,12 @@ function player_win(multiplier = 1) {
     push_message("You won: \$" + bet * multiplier);
     game_over = true;
     total_wins++;
-    money += bet * multiplier;
+    increment_money(bet * multiplier);
     document.backgroundColor = "green";
 
     deactivate_action_buttons();
     activate_betting_buttons();
+    transition_win_background();
     update_gui();
 }
 
@@ -367,7 +408,7 @@ function check_scores(first_check = false) {
     }
 
     // dealer score check
-    if (dealer_score == 21 && first_check) {
+    if (dealer_score == 21 && first_check && player_score != 21) {
         // if dealer got blackjack on first check, end the game and show the dealer's hand
         push_message("Dealer got Blackjack!");
         dealer_hand_container.innerHTML = "";
@@ -423,6 +464,16 @@ function action_stand() {
     deactivate_action_buttons();
 
     dealer_turn();
+}
+
+// surrender function
+function action_surrender() {
+    push_message("You surrendered! You lost half your bet.");
+    game_over = true;
+    total_losses++;
+    increment_money(-bet / 2);
+    document.backgroundColor = "red";
+    reset_game();
 }
 
 let cards_drawn = 0;
@@ -505,11 +556,13 @@ function activate_action_buttons() {
     stand_button.disabled = false;
     double_button.disabled = false;
     split_button.disabled = false;
+    surrender_button.disabled = false;
 
     hit_button.style.backgroundColor = "white";
     stand_button.style.backgroundColor = "white";
     double_button.style.backgroundColor = "white";
     split_button.style.backgroundColor = "white";
+    surrender_button.style.backgroundColor = "white";
 }
 
 function deactivate_action_buttons() {
@@ -517,11 +570,13 @@ function deactivate_action_buttons() {
     stand_button.disabled = true;
     double_button.disabled = true;
     split_button.disabled = true;
+    surrender_button.disabled = true;
 
     hit_button.style.backgroundColor = "gray";
     stand_button.style.backgroundColor = "gray";
     double_button.style.backgroundColor = "gray";
     split_button.style.backgroundColor = "gray";
+    surrender_button.style.backgroundColor = "gray";
 }
 
 function activate_betting_buttons() {
@@ -603,10 +658,19 @@ function reset_game() {
         activate_betting_buttons();
         start_button.disabled = false;
 
-        transition_green_background();
+        reset_background();
         push_message("Game restarted to default.");
 
         temp_deck = [];  // empties the temp deck
+        
+        // if player broke, give them a small grant and reset, also give them a banruptcy stat
+        if (money <= 0) {
+            push_message("You're broke! Game over.");
+            push_message("You get a small grant of \$10,000 to start over.");
+            //money = 10000;
+            set_money(10000);
+            total_banruptcy++;
+        }
 
         // automatic bet
         if (automatic_bet) {
@@ -617,27 +681,69 @@ function reset_game() {
                 set_bet(Math.floor(money * (bet_percent / 100)));
             }
         }
-        
-        // if player broke, give them a small grant and reset, also give them a banruptcy stat
-        if (money <= 0) {
-            push_message("You're broke! Game over.");
-            push_message("You get a small grant of \$10,000 to start over.");
-            money = 10000;
-            total_banruptcy++;
-        }
 
         update_gui();
     }
 }
 
 // makes the background red
-function transition_red_background() {
-    background_div.style.opacity = "0";
+function transition_loss_background() {
+    //background_div.style.opacity = "0";
+    background_div_loss.style.opacity = "1";
+    background_div_win.style.opacity = "0";
 }
 
 // makes the background green
-function transition_green_background() {
-    background_div.style.opacity = "1";
+function transition_win_background() {
+    //background_div.style.opacity = "0";
+    background_div_loss.style.opacity = "0";
+    background_div_win.style.opacity = "1";
+}
+
+function reset_background() {
+    //background_div.style.opacity = "1";
+    background_div_loss.style.opacity = "0";
+    background_div_win.style.opacity = "0";
+}
+
+// dropdown menu functions
+var dropdown_visible = false;
+function game_stats_dropdown_button() {
+    if (dropdown_visible) {
+        stats_dropdown_panel.style.display = "none";
+    }
+    else
+    {
+        stats_dropdown_panel.style.display = "block";
+    }
+    dropdown_visible = !dropdown_visible;
+}
+
+// game settings dropdown
+var game_settings_dropdown_visible = false;
+function toggle_game_panel() {
+    if (game_settings_dropdown_visible) {
+        game_settings_dropdown_panel.style.display = "none";
+    }
+    else
+    {
+        game_settings_dropdown_panel.style.display = "block";
+    }
+    game_settings_dropdown_visible = !game_settings_dropdown_visible;
+}
+
+// card counting toggle
+function card_counting_toggle() {
+    infinite_deck = !infinite_deck;
+    if (infinite_deck) {
+        push_message("∞ deck enabled.");
+        game_card_settings.style = "display: none;";
+    }
+    else
+    {
+        push_message("∞ deck disabled.");
+        game_card_settings.style = "display: block;";
+    }
 }
 
 // general start functions
