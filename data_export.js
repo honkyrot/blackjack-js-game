@@ -69,7 +69,7 @@ function export_data_csv() {
 
         // i dunno how this shit works
         csv_rows.push(values.join("\n"));
-        const csvData = csvRows.join("\n");
+        const csvData = csv_rows.join("\n");
         const blob = new Blob([csvData], { type: "text/csv" });
         const url = window.URL.createObjectURL(blob);
 
