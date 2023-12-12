@@ -675,11 +675,17 @@ function create_deck() {
 function reset_game() {
     if (reset_able || game_over) {
         reset_able = false
+        game_over = false;
+
+        // clear all timeouts, hacky way to do it
+        var highest_timeout_id = setTimeout(";");
+        for (var i = 0 ; i < highest_timeout_id ; i++) {
+            clearTimeout(i); 
+        }
 
         player_hand = [];
         dealer_hand = [];
         player_turn = true;
-        game_over = false;
         player_score = 0;
         dealer_score = 0;
         //amount = 1000;
