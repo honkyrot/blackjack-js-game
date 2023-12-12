@@ -35,6 +35,9 @@ let total_pushes = 0;
 let total_losses = 0;
 let total_banruptcy = 0;  // when you lose all your money
 
+// cheat variables
+let cheat_double_earnings = false;  // if true, you will earn double the money on wins
+
 //card deck objects!
 const card_deck = [
     {src:'hearts-r02.svg', value:2, suit:"hearts"}, {src:'hearts-r03.svg', value:3, suit:"hearts"}, {src:'hearts-r04.svg', value:4, suit:"hearts"},
@@ -367,11 +370,19 @@ function check_ace(hand, score, player = true) {
 
 // you win
 function player_win(multiplier = 1) {
-    push_message("You won: \$" + bet * multiplier);
     game_over = true;
     total_wins++;
-    increment_money(bet * multiplier);
     document.backgroundColor = "green";
+
+    if (cheat_double_earnings) {
+        increment_money((bet * multiplier) * 2);
+        push_message("You won: \$" + (bet * multiplier) + " x2");
+    }
+    else{
+        //money += bet * multiplier;
+        increment_money(bet * multiplier);
+        push_message("You won: \$" + bet * multiplier);
+    }
 
     deactivate_action_buttons();
     activate_betting_buttons();
@@ -816,8 +827,20 @@ function apply_game_settings() {
 
     // starting money
     starting_money = document.getElementById("starting_amount_input").value;
-    starting_money = Math.floor(starting_money);
+    starting_money = Math.abs(Math.floor(starting_money));
     set_money(starting_money);
+}
+
+// double earnings toggle
+function double_earnings_toggle() {
+    if (cheat_double_earnings) {
+        push_message("(cheat) disabled double earnings.");
+    }
+    else
+    {
+        push_message("(cheat) enabled double earnings.");
+    }
+    cheat_double_earnings = !cheat_double_earnings;
 }
 
 // general start functions

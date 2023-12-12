@@ -75,12 +75,18 @@ h2 {
     transition: opacity 0.5s ease-in-out;
 }
 
+/* the title div */
 .title_div {
     color: #ffffff;
     font-size: 50px;
     text-align: center;
     margin: 0;
     padding: 0;
+    transition: text-shadow 0.5s ease;
+}
+
+.title_div:hover {
+    text-shadow: 0px 0px 5px #ffffff;
 }
 
 /* for the cards and stuff to be held in */
@@ -439,7 +445,7 @@ h2 {
 /* deck container */
 .deck_size_div {
     position: absolute;
-    top: 0%;
+    bottom: 0%;
     left: 90%;
 }
 

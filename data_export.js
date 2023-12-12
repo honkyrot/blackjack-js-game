@@ -42,7 +42,7 @@ function save_current_data_entry() {
         "wins": total_wins,
         "loss" : total_losses,
         "pushes": total_pushes,
-        "bankruptices": 0,
+        "bankruptices": total_banruptcy,
         "cards_left" : deck_size,});
 
         data_indexed_entries++;
@@ -56,9 +56,9 @@ function export_data_csv() {
     if (data_save && data_entries.length > 0) {
         push_message("Exporting data to csv...");
         // funky shit, helped by https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
-        csvRows = [];
+        csv_rows = [];
         const headers = Object.keys(data_entries[0]);
-        csvRows.push(headers.join(","));
+        csv_rows.push(headers.join(","));
         const values = data_entries.map(row => {
             const values = headers.map(header => {
                 const escaped = ("" + row[header]).replace(/"/g, '\\"');
@@ -68,7 +68,7 @@ function export_data_csv() {
         });
 
         // i dunno how this shit works
-        csvRows.push(values.join("\n"));
+        csv_rows.push(values.join("\n"));
         const csvData = csvRows.join("\n");
         const blob = new Blob([csvData], { type: "text/csv" });
         const url = window.URL.createObjectURL(blob);

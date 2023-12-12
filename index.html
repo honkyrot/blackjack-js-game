@@ -8,7 +8,7 @@
 
 <header>
     <div class="title_div">
-        <h1> Blackjack Game</h1>
+        <h1>blackjack-js-game</h1>
     </div>
 
     <!-- background gradient and overlay -->
@@ -68,6 +68,14 @@
                     <p>Starting Amount: <input class="starting_amount_input" type="number" id="starting_amount_input" placeholder="0" value="10000"></p>
                     <button class="game_setting_button" style="border-radius: 8px;" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
                 </div>
+            </div>
+
+            <!-- double earnings!? -->
+            <div class="game_settings_4" title="Double the amount you earn. (cheat)">
+                <p> 
+                    <input type="checkbox" id="double_earnings_toggle" onclick="double_earnings_toggle()">
+                    Double Earnings
+                </p>
             </div>
         </div>
     </div>
