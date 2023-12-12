@@ -28,11 +28,22 @@ function data_save_toggle() {
 
 // save current data entry
 function save_current_data_entry() {
+    var deck_size = temp_deck.length;
+    // if infinite deck, set deck size to 0
+    if (infinite_deck) {
+        deck_size = 0;
+    }
+
     if (data_save) {
-        data_entries.push({"game": total_resets, "money" : money,
+        data_entries.push(
+        {"game": total_resets, 
+        "money" : money,
         "bet": bet,
-        "wins": total_wins, "loss" : total_losses,
-        "pushes": total_pushes, "bankruptices": 0});
+        "wins": total_wins,
+        "loss" : total_losses,
+        "pushes": total_pushes,
+        "bankruptices": 0,
+        "cards_left" : deck_size,});
 
         data_indexed_entries++;
         game_data_current_entries_text.innerHTML = data_indexed_entries.toString() + " entries";

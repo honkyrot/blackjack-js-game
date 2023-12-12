@@ -38,7 +38,7 @@
             <div class="game_settings_1" title="If the game will have a set deck size (2-8 deck size of 52 cards)">
                 <p id="setting_limited_deck">
                     <input type="checkbox" id="card_counting_toggle" onclick="card_counting_toggle()">
-                    Finite Deck (wip)
+                    Finite Deck
                 </p>
                 <div class="game_card_settings" id="game_card_settings">
                     <p>Deck Size: <input class="deck_custom_size" type="number" id="custom_deck_input" placeholder="2-8" value="2"></p>
@@ -47,7 +47,7 @@
             </div>
 
             <!-- data saving -->
-            <div class="game_settings_2" title="Enable this to start saving data.">
+            <div class="game_settings_2" title="Enable this to start recording data for visualization purposes.">
                 <p id="setting_data_visualization">
                     <input type="checkbox" id="data_visualization_toggle" onclick="data_save_toggle()">
                     CSV Data Saving
@@ -110,7 +110,7 @@
 
         <div class="deck_size_div">
             <p>Cards Left</p>
-            <p><span id="deck_size">inf</span></p>
+            <p><span id="deck_size">52</span></p>
         </div>
     </div>
 

@@ -26,6 +26,7 @@ let automatic_bet = false;  // if true, the bet will be automatically set to the
 let infinite_deck = true;  // if true, the game will use an infinite deck, voiding the card counting system
 let deck_count = 1;  // how many decks to use, only works if infinite_deck is false
 let deck_count_max = 8;  // max amount of decks to use, only works if infinite_deck is false
+let minimum_cards_left = 20;  // minimum amount of cards left before the deck is reshuffled, only works if infinite_deck is false
 
 //misc variables
 let total_resets = 0;
@@ -71,6 +72,7 @@ const bet_amount_percent_text = document.getElementById("bet_amount_percent");
 const money_amount_text = document.getElementById("money_amount");
 const custom_bet_input = document.getElementById("custom_bet_input");
 const automatic_bet_text = document.getElementById("automatic_betting_text");
+const deck_size_text = document.getElementById("deck_size");
 
 const hit_button = document.getElementById("hit_button");
 const stand_button = document.getElementById("stand_button");
@@ -106,6 +108,7 @@ const stats_dropdown_panel = document.getElementById("game_stats_dropdown_panel"
 const game_settings_dropdown_panel = document.getElementById("game_settings_dropdown");
 const game_card_settings = document.getElementById("game_card_settings");
 const game_starting_amount_div = document.getElementById("starting_amount_div");
+const game_custom_deck_input = document.getElementById("custom_deck_input");
 // more constants in data_export.js for data exporting
 
 
@@ -237,8 +240,7 @@ function get_random_card() {
 function start_game() {
     total_resets++;  // add to the total resets
 
-    // temp_deck = card_deck.slice();  // copy the deck to the temp deck
-    temp_deck = structuredClone(card_deck);  // copy the deck to the temp deck, new method
+    create_deck();
 
     dealer_hand_container.innerHTML = "";
     player_hand_container.innerHTML = "";
@@ -298,12 +300,14 @@ function dealer_first_start() {
 
     split_check();
     check_scores(true);
+    update_gui();
 }
 
 // quick function to update scores and text
 function update_gui() {
     player_score_text.innerHTML = player_score;
     money_amount_text.innerHTML = `\$${money.toLocaleString()}`;
+    deck_size_text.innerHTML = temp_deck.length;
 
     // dealer score check
     //if (dealer_hand.length == 2) {
@@ -554,7 +558,6 @@ function visualize_card(card, container) {
 }
 
 // activation functions
-
 function activate_action_buttons() {
     hit_button.disabled = false;
     stand_button.disabled = false;
@@ -619,6 +622,7 @@ function deactivate_betting_buttons() {
     custom_bet_button.style.backgroundColor = "gray";
 }
 
+// automatic bet toggle
 function automatic_bet_toggle() {
     automatic_bet = !automatic_bet;
     if (automatic_bet) {
@@ -627,6 +631,32 @@ function automatic_bet_toggle() {
     else
     {
         push_message("Automatic bet disabled.");
+    }
+}
+
+// create a deck of cards or reset the deck
+function create_deck() {
+    if (infinite_deck) {
+        temp_deck = card_deck;
+        // temp_deck = card_deck.slice();  // copy the deck to the temp deck
+        temp_deck = structuredClone(card_deck);  // copy the deck to the temp deck, new method
+    }
+    else
+    {
+        var deck_length = temp_deck.length;
+        var temp_temp_deck = [];
+
+        // check if the deck is too small and needs to be refreshed
+        if (deck_length <= minimum_cards_left) {
+            temp_deck = [];
+            // create a new deck
+            for (let i = 0; i < deck_count; i++) {
+                temp_temp_deck = structuredClone(card_deck);
+                temp_deck = temp_deck.concat(temp_temp_deck);
+            }
+
+            push_message("Deck refreshed.");
+        }
     }
 }
 
@@ -665,7 +695,8 @@ function reset_game() {
         reset_background();
         push_message("Game restarted to default.");
 
-        temp_deck = [];  // empties the temp deck
+        create_deck();
+        
         
         // if player broke, give them a small grant and reset, also give them a banruptcy stat
         if (money <= 0) {
@@ -773,7 +804,15 @@ function apply_game_settings() {
     push_message("Game settings applied.");
 
     // deck
-    // wip
+    deck_count = document.getElementById("custom_deck_input").value;
+    deck_count = Math.floor(deck_count);
+    deck_count = Math.abs(deck_count);
+    if (deck_count > deck_count_max) {
+        deck_count = deck_count_max;
+    }
+    else if (deck_count < 1) {
+        deck_count = 1;
+    }
 
     // starting money
     starting_money = document.getElementById("starting_amount_input").value;
