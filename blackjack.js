@@ -3,22 +3,31 @@
 // inspired by https://github.com/therealgman2016 to make this
 
 //game variables
-let player_hand = [];
 let dealer_hand = [];
 let player_turn = true;
+
+// player hand
+let player_hand = [];
 let players_hand_count = 0; // for split
-let players_hand_current = 0; // for split
+let current_player_index = 0; // for split
+var current_player_hand;
+var assigned_player_div; // for adding cards
+// formatted hand as
+//[[hand1],[hand2]]
+
+let total_player_score = 0;
+let player_score = [];
 
 //player variables
 let money = 10000;
 let starting_money = 10000;
+let total_betted = 0;  // all hands combined
 let bet = 0;
 let bet_percent = 0;
 
 //gameplay variables
 let game_active = false;
 let game_over = false;
-let player_score = 0;
 let dealer_score = 0;
 let automatic_bet = false;  // if true, the bet will be automatically set to the last bet percentage
 
@@ -67,7 +76,8 @@ const down_card = {src:'blue.svg', value:0, suit:"back"};
 
 //ids
 const dealer_hand_container = document.getElementById("dealers_hand_container");
-const player_hand_container = document.getElementById("players_hand_container");
+const players_hand_container = document.getElementById("players_hand_container");
+const player_hand_container = document.getElementById("players_hands_extra");
 const player_score_text = document.getElementById("player_hand_value");
 const dealer_score_text = document.getElementById("dealer_hand_value");
 const bet_amount_text = document.getElementById("bet_amount");
@@ -246,7 +256,7 @@ function start_game() {
     create_deck();
 
     dealer_hand_container.innerHTML = "";
-    player_hand_container.innerHTML = "";
+    players_hand_container.innerHTML = "";
 
     if (game_active) {
         push_message("Game is already active!");
@@ -260,6 +270,53 @@ function start_game() {
     split_button.disabled = true;  // disable split button until we know if the player has a split
 
     dealer_first_start();
+}
+
+// pushes a card to the player's hand,
+function push_player_card(index, card) {
+    if (player_hand[index] == undefined) {
+        player_hand[index] = [];
+        current_player_hand = player_hand[index];
+        current_player_hand.push(card);
+        players_hand_count++;
+
+        var div_hand = document.createElement("div");
+        div_hand.classList.add("extra_players_hand_container");
+        div_hand.id = `players_hand_container_${index}`;
+        players_hand_container.appendChild(div_hand);
+
+        var score_text = document.createElement("p");
+        score_text.innerHTML = `Hand Value: <span id=\"player_hand_value_${index}\">0</span>`;
+        score_text.style = "margin: 0px; padding: 0px; font-size: 16px; text-align: center; color: black;";
+        div_hand.appendChild(score_text);
+
+        assigned_player_div = div_hand;
+    }
+    else
+    {
+        current_player_hand = player_hand[index];
+        current_player_hand.push(card);
+
+        assigned_player_div = document.getElementById(`players_hand_container_${index}`);
+    }
+    current_player_index = index;
+}
+
+// returns the current player's score text
+function get_current_player_score_text() {
+    return document.getElementById(`player_hand_value_${current_player_index}`);
+}
+
+function add_to_player_score(index, amount) {
+    if (player_score[index] == undefined) {
+        player_score[index] = 0;
+        player_score[index] += amount;
+    }
+    else
+    {
+        player_score[index] += amount;
+    }
+    get_current_player_score_text().innerHTML = player_score[index];
 }
 
 // passes 2 cards to the dealer & player on start, dealer's first card is hidden
@@ -284,19 +341,23 @@ function dealer_first_start() {
     let card3 = get_random_card();
     let card4 = get_random_card();
 
-    player_hand.push(card3, card4);
+    //player_hand.push(card3, card4);
+    push_player_card(0, card3);
+    push_player_card(0, card4);
 
     setTimeout(() => {
-        visualize_card(card3, player_hand_container);
+        visualize_card(card3, assigned_player_div);
     }, 150);
     
     setTimeout(() => {
-        visualize_card(card4, player_hand_container);
+        visualize_card(card4, assigned_player_div);
     }, 200);
 
-    player_score += card3.value + card4.value;
+    //player_score += card3.value + card4.value;
+    add_to_player_score(0, card3.value + card4.value);
 
-    player_score_text.innerHTML = player_score;
+    //var player_score_text = get_current_player_score_text();
+    //player_score_text.innerHTML = player_score;
 
     check_ace(player_hand, player_score, true);
     check_ace(dealer_hand, dealer_score, false);
@@ -306,9 +367,18 @@ function dealer_first_start() {
     update_gui();
 }
 
+// updates all the text in every player's hand
+function update_players_hands() {
+    for (let i = 0; i < players_hand_count; i++) {
+        var score_text = document.getElementById(`player_hand_value_${i}`);
+        score_text.innerHTML = player_score[i];
+    }
+}
+
+
 // quick function to update scores and text
 function update_gui() {
-    player_score_text.innerHTML = player_score;
+    update_players_hands(); 
     money_amount_text.innerHTML = `\$${money.toLocaleString()}`;
     deck_size_text.innerHTML = temp_deck.length;
 
@@ -402,7 +472,7 @@ function push() {
 
 // checks the player's score
 function check_scores(first_check = false) {
-    check_ace(player_hand, player_score, true);
+    check_ace(current_player_hand, player_score[current_player_index], true);
     check_ace(dealer_hand, dealer_score, false);
     
     if (player_score > 21) {
@@ -428,7 +498,7 @@ function check_scores(first_check = false) {
     }
 
     // dealer score check
-    if (dealer_score == 21 && first_check && player_score != 21) {
+    if (dealer_score == 21 && first_check && player_score[current_player_index] != 21) {
         // if dealer got blackjack on first check, end the game and show the dealer's hand
         push_message("Dealer got Blackjack!");
         dealer_hand_container.innerHTML = "";
@@ -467,9 +537,9 @@ function check_final_scores() {
 // hit function
 function action_hit() {
     var new_card = get_random_card();
-    visualize_card(new_card, player_hand_container);
-    player_hand.push(new_card);
-    player_score += new_card.value;
+    visualize_card(new_card, assigned_player_div);
+    current_player_hand.push(new_card);
+    player_score[current_player_index] += new_card.value;
 
     update_gui();
     check_scores();
@@ -544,7 +614,7 @@ function dealer_turn() {
 
 // checks if the player has a split their hand
 function split_check() {
-    if (player_hand[0].value == player_hand[1].value) {
+    if (current_player_hand[0].value == current_player_hand[1].value) {
         split_button.disabled = false;
     }
 }
@@ -683,21 +753,25 @@ function reset_game() {
             clearTimeout(i); 
         }
 
-        player_hand = [];
+        player_hand = [];  // empty hands
         dealer_hand = [];
         player_turn = true;
         player_score = 0;
         dealer_score = 0;
         //amount = 1000;
-        bet = 0;
+
+        players_hand_count = 0;
+        current_player_index = 0;
+        current_player_hand = [];
+        assigned_player_div = [];
 
         dealer_hand_container.style.left = "50%";
-        player_hand_container.style.left = "50%";
+        //players_hand_container.style.left = "50%";
 
         dealer_hand_container.innerHTML = "";
-        player_hand_container.innerHTML = "";
+        players_hand_container.innerHTML = "";
 
-        player_score_text.innerHTML = "";
+        //player_score_text.innerHTML = "";
         dealer_score_text.innerHTML = "";
 
         bet_amount_text.innerHTML = "\$0";
@@ -740,6 +814,7 @@ function reset_game() {
         }
 
         update_gui();
+        bet = 0;
     }
 }
 
