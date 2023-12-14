@@ -10,6 +10,7 @@ let player_turn = true;
 let player_hand = [];
 let players_hand_count = 0; // for split
 let current_player_index = 0; // for split
+let maximum_hands = 4; // current max hands, 1 by default
 var current_player_hand;
 var assigned_player_div; // for adding cards
 // formatted hand as
@@ -46,6 +47,8 @@ let total_banruptcy = 0;  // when you lose all your money
 
 // cheat variables
 let cheat_double_earnings = false;  // if true, you will earn double the money on wins
+let cheat_max_hands = 0;  // if > 1, you can have more than 2 hands, acts like you've already split
+let cheat_max_hands_enabled = false; 
 
 //card deck objects!
 const card_deck = [
@@ -92,6 +95,11 @@ const stand_button = document.getElementById("stand_button");
 const double_button = document.getElementById("double_button");
 const split_button = document.getElementById("split_button");
 const surrender_button = document.getElementById("surrender_button");
+// alt for dynamic hands
+const hit_button_2 = document.getElementById("hit_button_2");
+const stand_button_2 = document.getElementById("stand_button_2");
+const double_button_2 = document.getElementById("double_button_2");
+const split_button_2 = document.getElementById("split_button_2");
 
 const bet_5_percent_button = document.getElementById("bet_5_percent_button");
 const bet_10_percent_button = document.getElementById("bet_10_percent_button");
@@ -122,6 +130,7 @@ const game_settings_dropdown_panel = document.getElementById("game_settings_drop
 const game_card_settings = document.getElementById("game_card_settings");
 const game_starting_amount_div = document.getElementById("starting_amount_div");
 const game_custom_deck_input = document.getElementById("custom_deck_input");
+const game_custom_hands_input = document.getElementById("hands_starting_div");
 // more constants in data_export.js for data exporting
 
 
@@ -258,7 +267,7 @@ function start_game() {
     dealer_hand_container.innerHTML = "";
     players_hand_container.innerHTML = "";
 
-    if (game_active) {
+    if (game_active) {  // check
         push_message("Game is already active!");
         return;
     }
@@ -283,7 +292,11 @@ function push_player_card(index, card) {
         var div_hand = document.createElement("div");
         div_hand.classList.add("extra_players_hand_container");
         div_hand.id = `players_hand_container_${index}`;
+        div_hand.style.left = "50%";
+        div_hand.style.translateX = "-50%";
         players_hand_container.appendChild(div_hand);
+
+        players_hand_container.style.height = `${players_hand_count * 200}px`;
 
         var score_text = document.createElement("p");
         score_text.innerHTML = `Hand Value: <span id=\"player_hand_value_${index}\">0</span>`;
@@ -338,31 +351,42 @@ function dealer_first_start() {
 
     dealer_score_text.innerHTML = card1.value + "?";
 
-    let card3 = get_random_card();
-    let card4 = get_random_card();
+    for (let hands_index = 0; hands_index < maximum_hands; hands_index++) {
+        setTimeout(() => {
+            let card3 = get_random_card();
+            let card4 = get_random_card();
+
+            push_player_card(hands_index, card3);
+            push_player_card(hands_index, card4);
+
+            visualize_card(card3, assigned_player_div);
+            visualize_card(card4, assigned_player_div);
+
+            add_to_player_score(hands_index, card3.value + card4.value);
+            update_gui();
+        }
+        , 100 * hands_index);
+
+        //check_ace(player_hand, player_score, true);
+    }
+
+    set_player_index(0);  // reset the current player index
 
     //player_hand.push(card3, card4);
-    push_player_card(0, card3);
-    push_player_card(0, card4);
+   
 
-    setTimeout(() => {
-        visualize_card(card3, assigned_player_div);
-    }, 150);
     
-    setTimeout(() => {
-        visualize_card(card4, assigned_player_div);
-    }, 200);
 
     //player_score += card3.value + card4.value;
-    add_to_player_score(0, card3.value + card4.value);
+   
 
     //var player_score_text = get_current_player_score_text();
     //player_score_text.innerHTML = player_score;
 
-    check_ace(player_hand, player_score, true);
+    
     check_ace(dealer_hand, dealer_score, false);
 
-    split_check();
+    //split_check();
     check_scores(true);
     update_gui();
 }
@@ -375,6 +399,12 @@ function update_players_hands() {
     }
 }
 
+// set player's index
+function set_player_index(index) {
+    current_player_index = index;
+    current_player_hand = player_hand[index];
+    assigned_player_div = document.getElementById(`players_hand_container_${index}`);
+}
 
 // quick function to update scores and text
 function update_gui() {
@@ -424,7 +454,7 @@ function check_ace(hand, score, player = true) {
                 card.value = 1;
                 //console.log(card_deck)
                 if (player) {  // subtract 10 from the player's score
-                    player_score -= 10;
+                    player_score[current_player_index] -= 10;
                 }
                 else{
                     dealer_score -= 10;
@@ -475,11 +505,11 @@ function check_scores(first_check = false) {
     check_ace(current_player_hand, player_score[current_player_index], true);
     check_ace(dealer_hand, dealer_score, false);
     
-    if (player_score > 21) {
+    if (player_score[current_player_index] > 21) {
         push_message("You busted!");
         bust();
     }
-    else if (player_score == 21) {
+    else if (player_score[current_player_index]  == 21) {
         if (dealer_score != 21) {
             if (first_check) {
                 push_message("You got Blackjack!");
@@ -613,12 +643,6 @@ function dealer_turn() {
 }
 
 // checks if the player has a split their hand
-function split_check() {
-    if (current_player_hand[0].value == current_player_hand[1].value) {
-        split_button.disabled = false;
-    }
-}
-
 
 // makes a card element
 function visualize_card(card, container) {
@@ -645,12 +669,20 @@ function activate_action_buttons() {
     double_button.disabled = false;
     split_button.disabled = false;
     surrender_button.disabled = false;
+    hit_button_2.disabled = false;
+    stand_button_2.disabled = false;
+    double_button_2.disabled = false;
+    split_button_2.disabled = false;
 
     hit_button.style.backgroundColor = "white";
     stand_button.style.backgroundColor = "white";
     double_button.style.backgroundColor = "white";
     split_button.style.backgroundColor = "white";
     surrender_button.style.backgroundColor = "white";
+    hit_button_2.style.backgroundColor = "white";
+    stand_button_2.style.backgroundColor = "white";
+    double_button_2.style.backgroundColor = "white";
+    split_button_2.style.backgroundColor = "white";
 }
 
 function deactivate_action_buttons() {
@@ -659,12 +691,20 @@ function deactivate_action_buttons() {
     double_button.disabled = true;
     split_button.disabled = true;
     surrender_button.disabled = true;
+    hit_button_2.disabled = true;
+    stand_button_2.disabled = true;
+    double_button_2.disabled = true;
+    split_button_2.disabled = true;
 
     hit_button.style.backgroundColor = "gray";
     stand_button.style.backgroundColor = "gray";
     double_button.style.backgroundColor = "gray";
     split_button.style.backgroundColor = "gray";
     surrender_button.style.backgroundColor = "gray";
+    hit_button_2.style.backgroundColor = "gray";
+    stand_button_2.style.backgroundColor = "gray";
+    double_button_2.style.backgroundColor = "gray";
+    split_button_2.style.backgroundColor = "gray";
 }
 
 function activate_betting_buttons() {
@@ -756,17 +796,19 @@ function reset_game() {
         player_hand = [];  // empty hands
         dealer_hand = [];
         player_turn = true;
-        player_score = 0;
+        player_score = [];
         dealer_score = 0;
         //amount = 1000;
 
         players_hand_count = 0;
-        current_player_index = 0;
+        current_player_index = 0;  // would use the function but next lines empty the div
         current_player_hand = [];
         assigned_player_div = [];
 
         dealer_hand_container.style.left = "50%";
         //players_hand_container.style.left = "50%";
+
+        players_hand_container.style.height = "200px";
 
         dealer_hand_container.innerHTML = "";
         players_hand_container.innerHTML = "";
@@ -924,8 +966,25 @@ function double_earnings_toggle() {
     cheat_double_earnings = !cheat_double_earnings;
 }
 
+// multiple hands toggle
+function hands_starting_toggle() {
+    if (cheat_max_hands_enabled) {
+        push_message("(cheat) disabled multiple hands.");
+        game_custom_hands_input.style = "display: none;";
+        cheat_max_hands = 0;
+    }
+    else
+    {
+        push_message("(cheat) enabled multiple hands.");
+        game_custom_hands_input.style = "display: block;";
+        cheat_max_hands = 2;
+    }
+    cheat_max_hands_enabled = !cheat_max_hands_enabled;
+}
+
 // general start functions
 deactivate_action_buttons();
 activate_betting_buttons();
 push_message("Welcome to Blackjack!");
 push_message("Start the game with any bet.");
+reset_game();

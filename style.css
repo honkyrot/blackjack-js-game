@@ -3,6 +3,10 @@
     src: url("media/Montserrat-Medium.ttf");
 }
 
+html {
+    overflow-y: scroll;
+}
+
 /* general */
 p {
     font-family: "Montserrat";
@@ -141,7 +145,7 @@ h2 {
     left: 5%;
     position: relative;
     z-index: 2;
-    transition: left 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
 }
 
 /* for extra hands */
@@ -149,6 +153,7 @@ h2 {
     background-color: rgba(0, 0, 0, 0);
     padding: 0px;
     margin: 0px;
+    margin-bottom: 40px;
     width: fit-content;
     height: 150px;
     position: relative;
@@ -172,7 +177,7 @@ h2 {
 
 /* for the players cards to be held in */
 .current_hand_selection_box {
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0);
     padding: 10px;
     margin: 2px;
     width: fit-content;
@@ -184,7 +189,13 @@ h2 {
     z-index: 0;
     top: 0%;
     transition: left 0.5s ease-in-out;
-    box-shadow: 0px 0px 5px black;
+    outline: 2px solid #ffffff;
+}
+
+/* text for selected hand box */
+.selected_hand_text {
+    position: absolute;
+    top: -40px;
 }
 
 
