@@ -39,6 +39,8 @@ function save_current_data_entry() {
         {"game": total_resets, 
         "money" : money,
         "bet": bet,
+        "potential_earnings": potential_earnings,
+        "hands_played": maximum_hands,
         "wins": total_wins,
         "loss" : total_losses,
         "pushes": total_pushes,

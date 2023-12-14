@@ -8,9 +8,12 @@ let player_turn = true;
 
 // player hand
 let player_hand = [];
+let player_hand_variables = [];  // variables like if it busted, won, etc
+// player_hand_variables in the format of
+// {bet: 0, hit: 0, stand: false, double: false, split: false, surrender: false, bust: false, win: false, blackjack: false, twenty_one: false, disabled: false}
 let players_hand_count = 0; // for split
 let current_player_index = 0; // for split
-let maximum_hands = 4; // current max hands, 1 by default
+let maximum_hands = 20; // current max hands, 1 by default
 var current_player_hand;
 var assigned_player_div; // for adding cards
 // formatted hand as
@@ -25,6 +28,7 @@ let starting_money = 10000;
 let total_betted = 0;  // all hands combined
 let bet = 0;
 let bet_percent = 0;
+let potential_earnings = 0; // how much you can earn (or lose)
 
 //gameplay variables
 let game_active = false;
@@ -32,9 +36,19 @@ let game_over = false;
 let dealer_score = 0;
 let automatic_bet = false;  // if true, the bet will be automatically set to the last bet percentage
 
+// temp gameplay variables
+let temp_hands_won = 0;
+let temp_hands_lost = 0;
+let temp_hands_pushed = 0;
+let temp_hands_blackjack = 0;
+let temp_hands_busted = 0;
+let temp_hands_surrendered = 0;
+let temp_hands_doubled = 0;
+let temp_hands_split = 0;
+
 // deck settings
-let infinite_deck = true;  // if true, the game will use an infinite deck, voiding the card counting system
-let deck_count = 1;  // how many decks to use, only works if infinite_deck is false
+let infinite_deck = false;  // if true, the game will use an infinite deck, voiding the card counting system
+let deck_count = 8;  // how many decks to use, only works if infinite_deck is false
 let deck_count_max = 8;  // max amount of decks to use, only works if infinite_deck is false
 let minimum_cards_left = 20;  // minimum amount of cards left before the deck is reshuffled, only works if infinite_deck is false
 
@@ -131,6 +145,7 @@ const game_card_settings = document.getElementById("game_card_settings");
 const game_starting_amount_div = document.getElementById("starting_amount_div");
 const game_custom_deck_input = document.getElementById("custom_deck_input");
 const game_custom_hands_input = document.getElementById("hands_starting_div");
+const game_current_hand_selection_box = document.getElementById("current_hand_selection_box");
 // more constants in data_export.js for data exporting
 
 
@@ -282,9 +297,21 @@ function start_game() {
 }
 
 // pushes a card to the player's hand,
+// if the hand doesn't exist, it will create a new hand
+// if the hand does exist, it will push the card to the hand
+// only function that creates a new hand
 function push_player_card(index, card) {
     if (player_hand[index] == undefined) {
         player_hand[index] = [];
+
+        player_hand_variables[index] = {bet: 0, hit: 0, stand: false,
+        double: false, split: false,
+        surrender: false, bust: false,
+        win: false, blackjack: false,
+        twenty_one: false, disabled: false};
+
+        player_hand_variables[index].bet = bet / maximum_hands;  // set the bet for the hand
+
         current_player_hand = player_hand[index];
         current_player_hand.push(card);
         players_hand_count++;
@@ -363,27 +390,27 @@ function dealer_first_start() {
             visualize_card(card4, assigned_player_div);
 
             add_to_player_score(hands_index, card3.value + card4.value);
+
+            check_ace(player_hand[hands_index], player_score[hands_index], true);
             update_gui();
         }
-        , 100 * hands_index);
+        , 50 * hands_index);
 
         //check_ace(player_hand, player_score, true);
     }
 
-    set_player_index(0);  // reset the current player index
+    setTimeout(() => {
+        set_player_index(0);  // reset the current player index
 
-    //player_hand.push(card3, card4);
-   
-
+        split_check(0);
+    }, 50 * maximum_hands);
     
-
+    //player_hand.push(card3, card4);
     //player_score += card3.value + card4.value;
-   
 
     //var player_score_text = get_current_player_score_text();
     //player_score_text.innerHTML = player_score;
 
-    
     check_ace(dealer_hand, dealer_score, false);
 
     //split_check();
@@ -428,21 +455,6 @@ function update_gui() {
     stats_banruptcy.innerHTML = total_banruptcy;
 }
 
-// you lose
-function bust() {
-    push_message("You lost: \$" + bet);
-    game_over = true;
-    total_losses++;
-    //money -= bet;
-    increment_money(-bet);
-    document.backgroundColor = "red";
-
-    deactivate_action_buttons();
-    activate_betting_buttons();
-    update_gui();
-    transition_loss_background();
-}
-
 // check ace function
 function check_ace(hand, score, player = true) {
     var temp_score = score; // in case theres multiple aces
@@ -468,132 +480,222 @@ function check_ace(hand, score, player = true) {
     }
 }
 
-// you win
-function player_win(multiplier = 1) {
-    game_over = true;
-    total_wins++;
-    document.backgroundColor = "green";
+// push a message to be plastered on the hand, usually used when the hand cannot be used anymore like a bust or win
+function push_hand_message(index, message, sub_message = "", custom_color = "white") {
+    var hand_div = document.getElementById(`players_hand_container_${index}`)
+    var message_div = document.createElement("div");
+    message_div.classList.add("hand_message");
 
-    if (cheat_double_earnings) {
-        increment_money((bet * multiplier) * 2);
-        push_message("You won: \$" + (bet * multiplier) + " x2");
-    }
-    else{
-        //money += bet * multiplier;
-        increment_money(bet * multiplier);
-        push_message("You won: \$" + bet * multiplier);
-    }
+    message_div.innerHTML = '<p style="font-size: 4vw; margin-bottom: 0px; color: ' + custom_color + ';">' + message + "</p>";
 
-    deactivate_action_buttons();
-    activate_betting_buttons();
-    transition_win_background();
-    update_gui();
+    if (sub_message != "") {
+        message_div.innerHTML += '<br><p style="font-size: 2vw; margin-top: 0px; color: ' + custom_color + ';">' + sub_message + "</p>";
+    }
+    hand_div.appendChild(message_div);
 }
 
-//push
-function push() {
-    push_message("You tied with the dealer! (push)");
-    deactivate_action_buttons();
-    activate_betting_buttons();
-    update_gui();
-    total_pushes++;
-    game_over = true;
-}
-
-// checks the player's score
-function check_scores(first_check = false) {
-    check_ace(current_player_hand, player_score[current_player_index], true);
-    check_ace(dealer_hand, dealer_score, false);
-    
-    if (player_score[current_player_index] > 21) {
-        push_message("You busted!");
-        bust();
-    }
-    else if (player_score[current_player_index]  == 21) {
-        if (dealer_score != 21) {
-            if (first_check) {
-                push_message("You got Blackjack!");
-                player_win(1.5);  // pays 3:2
-            }
-            else
-            {
-                push_message("You got 21!");
-                player_win();
-            }
+// check if specific hand has a split
+function split_check(index) {
+    if (player_hand_variables[index].split == false && player_hand_variables[index].hit == 0) {
+        if (player_hand[index][0].value == player_hand[index][1].value) {
+            split_button.disabled = false;
+            split_button_2.disabled = false;
         }
         else
         {
-            push();  // push when both players have 21
+            split_button.disabled = true;
+            split_button_2.disabled = true;
+        }
+    } 
+    else
+    {
+        split_button.disabled = true;
+        split_button_2.disabled = true;
+    }
+}
+
+// shifts the player's hand to the next hand down, if there is no hand, it will go to the dealer's hand
+function change_hands() {
+    if (current_player_index < players_hand_count - 1) {
+        set_player_index(current_player_index + 1);
+        game_current_hand_selection_box.style.top = `${current_player_index * 190}px`;
+
+        // reset the buttons
+        double_button.disabled = false;
+        double_button_2.disabled = false;
+        split_button.disabled = false;
+        split_button_2.disabled = false;
+
+        // do checks
+        split_check(current_player_index);
+    }
+    else
+    {
+        player_turn = false;
+        dealer_turn();
+    }
+
+    console.log("Changed hands to " + current_player_index);
+}
+
+// you lose, you lost the bet and the hand, but you can still play if you have more hands
+function bust(index) {
+    temp_hands_busted++;
+    push_hand_message(index, "BUST", "Lost: \$" + player_hand_variables[index].bet, "pink");
+    potential_earnings -= player_hand_variables[index].bet;
+
+    change_hands();
+}
+
+// checks the final scores
+function check_final_scores() {
+    // look through all hands and compare them to the dealer's hand
+    if (dealer_score > 21) {
+        for (let i = 0; i < players_hand_count; i++) {
+            // make sure hand is still valid
+            if (!player_hand_variables[i].disabled) { 
+                player_hand_variables[i].win = true;
+                player_hand_variables[i].disabled = true;
+                temp_hands_won++;
+                push_hand_message(i, "WIN", "Won: \$" + player_hand_variables[i].bet, "lightgreen");
+                potential_earnings += player_hand_variables[i].bet;
+            }
+        }
+
+        push_message("Dealer busted!");
+    }
+    else
+    {
+        for (let i = 0; i < players_hand_count; i++) {
+            // make sure hand is still valid
+            if (!player_hand_variables[i].disabled) { 
+                // check if the player's hand is greater than the dealer's hand
+                if (player_score[i] > dealer_score) {
+                    player_hand_variables[i].win = true;
+                    player_hand_variables[i].disabled = true;
+                    temp_hands_won++;
+                    push_hand_message(i, "WIN", "Won: \$" + player_hand_variables[i].bet, "lightgreen");
+                    potential_earnings += player_hand_variables[i].bet;
+                }
+                // push check
+                else if (player_score[i] == dealer_score) {
+                    player_hand_variables[i].disabled = true;
+                    temp_hands_pushed++;
+                    push_hand_message(i, "PUSH", "", "white");
+                }
+                // dealer wins
+                else
+                {
+                    player_hand_variables[i].disabled = true;
+                    temp_hands_lost++;
+                    push_hand_message(i, "LOST", "Lost: \$" + player_hand_variables[i].bet, "pink");
+                    potential_earnings -= player_hand_variables[i].bet;
+                }
+            }
         }
     }
 
-    // dealer score check
-    if (dealer_score == 21 && first_check && player_score[current_player_index] != 21) {
-        // if dealer got blackjack on first check, end the game and show the dealer's hand
-        push_message("Dealer got Blackjack!");
-        dealer_hand_container.innerHTML = "";
-        setTimeout(() => {
-            dealer_hand_container.innerHTML = "";
-            visualize_card(dealer_hand[0], dealer_hand_container);
-            visualize_card(dealer_hand[1], dealer_hand_container);
-            dealer_score_text.innerHTML = dealer_score;
-        }, 400);
-        
-        bust();
+    // money betting part
+    if (potential_earnings > 0) {
+        push_message("You won: \$" + potential_earnings);
+        increment_money(potential_earnings);
+
+        if (cheat_double_earnings) {  // double earnings cheat
+            increment_money(potential_earnings);
+        }
+
+        total_wins++;
+
+        transition_win_background();
     }
-    else if (dealer_score > 21) {
-        push_message("Dealer busted!");
-        player_win();
+    else if (potential_earnings < 0) {
+        push_message("You lost: \$" + Math.abs(potential_earnings));
+        increment_money(potential_earnings);
+
+        total_losses++;
+
+        transition_loss_background();
+    }
+    else
+    {
+        push_message("You broke even!");
+
+        total_pushes++;
+    }
+
+    reset_able = true;
+}
+
+// checks the player's score by looping through all the hands
+// if final_score is true, it will check the final score
+function check_scores() {
+    for (let i = 0; i < players_hand_count; i++) {
+        check_ace(player_hand[i], player_score[i], true);
+    }
+    check_ace(dealer_hand, dealer_score, false);
+
+    // check if the player busted
+    for (let i = 0; i < players_hand_count; i++) {
+        if (player_score[i] > 21 && !player_hand_variables[i].bust) {
+            player_hand_variables[i].bust = true;
+            player_hand_variables[i].disabled = true;
+            temp_hands_busted++;
+            bust(i);
+        }
+        else if (player_score[i] == 21 && player_hand_variables[i].twenty_one == false) {
+            player_hand_variables[i].twenty_one = true;
+        }
     }
 }
 
 var reset_able = true;
 
 // checks the final scores
-function check_final_scores() {
-    reset_able = true;
-    dealer_score_text.innerHTML = dealer_score;
-    if (player_score > dealer_score) {
-        player_win();
-    }
-    else if (player_score < dealer_score && dealer_score <= 21) {
-        bust();
-    }
-    else {
-        push();
-    }
-}
+// function check_final_scores() {
+//     reset_able = true;
+//     dealer_score_text.innerHTML = dealer_score;
+//     if (player_score > dealer_score) {
+//         player_win();
+//     }
+//     else if (player_score < dealer_score && dealer_score <= 21) {
+//         bust();
+//     }
+//     else {
+//         push();
+//     }
+// }
 
 // hit function
 function action_hit() {
     var new_card = get_random_card();
     visualize_card(new_card, assigned_player_div);
-    current_player_hand.push(new_card);
-    player_score[current_player_index] += new_card.value;
+    push_player_card(current_player_index, new_card);
+    add_to_player_score(current_player_index, new_card.value);
+
+    // disable double if the player has
+    double_button.disabled = true;
+    double_button_2.disabled = true;
+
+    split_check(current_player_index);
 
     update_gui();
     check_scores();
-    double_button.disabled = true;  // disable double button after first hit
+    //double_button.disabled = true;  // disable double button after first hit
+
+    player_hand_variables[current_player_index].hit++;
 }
 
 // stand function
 function action_stand() {
-    player_turn = false;
-    dealer_score_text.innerHTML = dealer_score;
-
-    deactivate_action_buttons();
-
-    dealer_turn();
+    player_hand_variables[current_player_index].stand = true;
+    change_hands();
 }
 
-// surrender function
 function action_surrender() {
-    push_message("You surrendered! You lost half your bet.");
-    game_over = true;
-    total_losses++;
-    increment_money(-bet / 2);
-    document.backgroundColor = "red";
-    reset_game();
+    player_hand_variables[current_player_index].surrender = true;
+    push_hand_message(current_player_index, "SURRENDER", "Lost: \$" + Math.floor(player_hand_variables[current_player_index].bet / 2), "pink");
+    potential_earnings -= Math.floor(player_hand_variables[current_player_index].bet / 2);
+    change_hands();
 }
 
 let cards_drawn = 0;
@@ -625,6 +727,8 @@ function dealer_action() {
 
 // dealer turn function
 function dealer_turn() {
+    deactivate_action_buttons();
+
     // reveal dealer's first card
     dealer_hand_container.innerHTML = "";
     visualize_card(dealer_hand[0], dealer_hand_container);
@@ -787,6 +891,11 @@ function reset_game() {
         reset_able = false
         game_over = false;
 
+        // if data saving is enabled, call the data saving function
+        if (data_save) {
+            save_current_data_entry();  
+        }
+
         // clear all timeouts, hacky way to do it
         var highest_timeout_id = setTimeout(";");
         for (var i = 0 ; i < highest_timeout_id ; i++) {
@@ -798,7 +907,17 @@ function reset_game() {
         player_turn = true;
         player_score = [];
         dealer_score = 0;
+        potential_earnings = 0;
         //amount = 1000;
+
+        temp_hands_won = 0;
+        temp_hands_lost = 0;
+        temp_hands_pushed = 0;
+        temp_hands_blackjack = 0;
+        temp_hands_busted = 0;
+        temp_hands_surrendered = 0;
+        temp_hands_doubled = 0;
+        temp_hands_split = 0;
 
         players_hand_count = 0;
         current_player_index = 0;  // would use the function but next lines empty the div
@@ -807,17 +926,17 @@ function reset_game() {
 
         dealer_hand_container.style.left = "50%";
         //players_hand_container.style.left = "50%";
-
         players_hand_container.style.height = "200px";
 
         dealer_hand_container.innerHTML = "";
         players_hand_container.innerHTML = "";
-
         //player_score_text.innerHTML = "";
         dealer_score_text.innerHTML = "";
 
         bet_amount_text.innerHTML = "\$0";
         bet_amount_percent_text.innerHTML = "0%";
+
+        game_current_hand_selection_box.style.top = "0px";
 
         money_amount_text.innerHTML = `\$${money.toLocaleString()}`;
 
@@ -850,13 +969,7 @@ function reset_game() {
             }
         }
 
-        // if data saving is enabled, call the data saving function
-        if (data_save) {
-            save_current_data_entry();  
-        }
-
         update_gui();
-        bet = 0;
     }
 }
 

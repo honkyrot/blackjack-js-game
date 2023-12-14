@@ -13,6 +13,7 @@ p {
     color: #ffffff;
     font-size: 22px;
     margin: 10px;
+
 }
 
 /* background */
@@ -188,7 +189,7 @@ h2 {
     transform: translateX(-50%);
     z-index: 0;
     top: 0%;
-    transition: left 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
     outline: 2px solid #ffffff;
 }
 
@@ -519,6 +520,7 @@ h2 {
     display: none;
 }
 
+/* input bar for custom hand size */
 .starting_amount_input {
     background-color: #ffffff;
     border-radius: 16px;
@@ -528,4 +530,16 @@ h2 {
     line-height: 0px;
     font-size: 20px;
     font-family: "Montserrat";
+}
+
+/* text to be plastered on the screen */
+.hand_message {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    height: 100%;
+    text-align: center;
+    z-index: 2;
 }
