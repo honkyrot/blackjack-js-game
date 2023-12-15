@@ -52,7 +52,7 @@ let temp_hands_split = 0;
 let infinite_deck = false;  // if true, the game will use an infinite deck, voiding the card counting system
 let deck_count = 8;  // how many decks to use, only works if infinite_deck is false
 let deck_count_max = 8;  // max amount of decks to use, only works if infinite_deck is false
-let minimum_cards_left = 20;  // minimum amount of cards left before the deck is reshuffled, only works if infinite_deck is false
+let minimum_cards_left = 40;  // minimum amount of cards left before the deck is reshuffled, only works if infinite_deck is false
 
 // stats variables
 let total_resets = 0;
@@ -270,6 +270,11 @@ function increment_money(amount) {
 
 // picks a random card from the deck
 function get_random_card() {
+    // emergency deck creation
+    if (temp_deck.length < minimum_cards_left) {
+        create_deck();
+    }
+
     let random_card = Math.floor(Math.random() * temp_deck.length);
     let card = temp_deck[random_card];
 
@@ -298,7 +303,7 @@ function start_game() {
 
     push_message("Game started! Select your choice.");
 
-    activate_action_buttons();
+    //activate_action_buttons();
     deactivate_betting_buttons();
     start_button.disabled = true;
     split_button.disabled = true;  // disable split button until we know if the player has a split
@@ -405,6 +410,10 @@ function dealer_first_start() {
 
             check_ace(player_hand[hands_index], player_score[hands_index], true);
             update_gui();
+
+            if (hands_index == maximum_hands - 1) {
+                activate_action_buttons();
+            }
         }
         , 50 * hands_index);
 
@@ -609,7 +618,6 @@ function bust(index) {
 // checks the final scores
 function check_final_scores() {
     console.log("-----------------------------------");
-    document.documentElement.scrollTop = 0;  // scroll to the top
     var total_loops = 0;
     var timeout = 100;
 
@@ -622,6 +630,12 @@ function check_final_scores() {
                 player_hand_variables[i].disabled = true;
                 temp_hands_won++;
                 total_wins_per_hand++;
+
+                if (player_hand_variables[i].blackjack == true) {
+                    temp_hands_blackjack++;
+                    player_hand_variables[i].bet *= 1.5;
+                }
+
                 potential_earnings += player_hand_variables[i].bet;
 
                 setTimeout(() => {
@@ -754,6 +768,7 @@ function action_hit() {
         player_hand_variables[current_player_index].hit++;
 
         var new_card = get_random_card();
+        assigned_player_div = document.getElementById(`players_hand_container_${current_player_index}`);
         visualize_card(new_card, assigned_player_div);
         push_player_card(current_player_index, new_card);
         add_to_player_score(current_player_index, new_card.value);
@@ -807,6 +822,7 @@ function action_double() {
 
         // add another card
         var new_card = get_random_card();
+        assigned_player_div = document.getElementById(`players_hand_container_${current_player_index}`);
         visualize_card(new_card, assigned_player_div, true);
         push_player_card(current_player_index, new_card);
         add_to_player_score(current_player_index, new_card.value);
@@ -829,7 +845,7 @@ function action_split() {
     }
 
     var old_card_bet = player_hand_variables[current_player_index].bet;
-
+    
     old_index = current_player_index;
     // split the hand
     player_hand_variables[current_player_index].split = true;
@@ -881,6 +897,7 @@ function action_split() {
 
     current_player_index = old_index;
     split_check(current_player_index + temp_hands_split);
+    split_check(current_player_index);
 
     maximum_hands++;
     temp_hands_split++;
@@ -890,6 +907,8 @@ function action_split() {
 // surrender function
 function action_surrender() {
     player_hand_variables[current_player_index].surrender = true;
+    player_hand_variables[current_player_index].disabled = true;
+    player_hand_variables[current_player_index].disabled = true;
     push_hand_message(current_player_index, "SURRENDER", `Lost: \$ ${Math.floor(player_hand_variables[current_player_index].bet / 2)}`, "pink");
     potential_earnings -= Math.floor(player_hand_variables[current_player_index].bet / 2);
     potential_total -= Math.floor(player_hand_variables[current_player_index].bet / 2);
@@ -924,6 +943,7 @@ function dealer_action() {
 // dealer turn function
 function dealer_turn() {
     deactivate_action_buttons();
+    document.documentElement.scrollTop = 0;  // scroll to the top
 
     // reveal dealer's first card
     dealer_hand_container.innerHTML = "";
@@ -1118,6 +1138,7 @@ function reset_game() {
         dealer_score = 0;
         potential_earnings = 0;
         potential_total = 0;
+        bet = 0;
         maximum_hands = set_maximum_hands;
         //amount = 1000;
 
