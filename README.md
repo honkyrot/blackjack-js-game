@@ -11,6 +11,7 @@ Generally, you want to get 21 but not go over. And you have to beat the dealer.
 Hitting and standing. <br>
 CSV data recording for any data lovers. <br>
 Some customizable settings for fun or QOL. <br>
+Splitting and doubling
 
 ### WIP Features:
-Spliting and doubling
+QOL updates
