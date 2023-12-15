@@ -37,7 +37,7 @@
             <!-- card deck and counting -->
             <div class="game_settings_1" title="If the game will have a set deck size (2-8 deck size of 52 cards)">
                 <p id="setting_limited_deck">
-                    <input type="checkbox" id="card_counting_toggle" onclick="card_counting_toggle()">
+                    <input type="checkbox" id="card_counting_toggle" checked onclick="card_counting_toggle()">
                     Finite Deck
                 </p>
                 <div class="game_card_settings" id="game_card_settings">
@@ -77,6 +77,18 @@
                     Double Earnings
                 </p>
             </div>
+
+            <!-- custom starting hands -->
+            <div class="game_settings_5" title="Sets how much hands you start with. (cheat)">
+                <p id="hands_starting_amount"> 
+                    <input type="checkbox" id="hands_starting_toggle" onclick="hands_starting_toggle()">
+                    Custom Starting Hands
+                </p>
+                <div class="game_card_settings" id="hands_starting_div">
+                    <p>Starting Amount: <input class="starting_amount_input" type="number" id="starting_hands_input" placeholder="0" value="1"></p>
+                    <button class="game_setting_button" style="border-radius: 8px;" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
+                </div>
+            </div>
         </div>
     </div>
 </header>
@@ -105,15 +117,25 @@
 
         <!-- Player section -->
         <div class="players_hand_div">
-            <h2>Player's Hand</h2>
+            <h2>Your Hands</h2>
         </div>
 
         <div class="players_hands_extra" id="players_hands_extra"> <!-- for split hands -->
-            <div class="players_hand_container" id="players_hand_container"></div>
-        </div>
+            <div class="players_hand_container" id="players_hand_container">
+            </div>
 
-        <div class="player_hand_value_div">
-            <p>Player's Hand Value: <span id="player_hand_value">0</span></p>
+            <div class="current_hand_selection_box" id="current_hand_selection_box" style="z-index: 4;">
+                <div class="selected_hand_text">
+                    <p><b>SELECTED HAND</b></p>
+                </div>
+                <div class="action_buttons">
+                    <button class="button" style="margin: 4px" id="hit_button_2" onclick="action_hit()">Hit</button>
+                    <button class="button" style="margin: 4px" id="stand_button_2" onclick="action_stand()">Stand</button>
+                    <button class="button" style="margin: 4px" id="double_button_2" title="x2 your bet and get one card." onclick="action_double()">Double</button>
+                    <button class="button" style="margin: 4px" id="split_button_2" title="Split your hand into two seperate hands, betting on both too." onclick="action_split()">Split</button>
+                </div>
+                <p>POTENTIAL: <span class="money_text" id="money_change">0</span></p>
+            </div>
         </div>
 
         <div class="deck_size_div">
@@ -130,8 +152,8 @@
         <div class="action_buttons">
             <button class="button" id="hit_button" onclick="action_hit()">Hit</button>
             <button class="button" id="stand_button" onclick="action_stand()">Stand</button>
-            <button class="button" id="double_button" onclick="action_double()">Double</button>
-            <button class="button" id="split_button" onclick="action_split()">Split</button>
+            <button class="button" id="double_button" title="x2 your bet and get one card." onclick="action_double()">Double</button>
+            <button class="button" id="split_button" title="Split your hand into two seperate hands, betting on both too." onclick="action_split()">Split</button>
             <button class="button" id="surrender_button" title="Surrender with 50% of your bet returned." onclick="action_surrender()">Surrender</button>
         </div>
 
@@ -203,6 +225,7 @@
 </body>
 
 <footer>
-    <script type="text/javascript" src="blackjack.js"></script> <!-- blackjack script -->
     <script type="text/javascript" src="data_export.js"></script> <!-- data script -->
+    <script type="text/javascript" src="blackjack.js"></script> <!-- blackjack script -->
+    
 </footer>

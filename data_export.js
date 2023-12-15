@@ -39,9 +39,14 @@ function save_current_data_entry() {
         {"game": total_resets, 
         "money" : money,
         "bet": bet,
+        "potential_earnings": potential_earnings,
         "wins": total_wins,
         "loss" : total_losses,
         "pushes": total_pushes,
+        "hands_played": maximum_hands,
+        "win_per_hand": total_wins_per_hand,
+        "loss_per_hand": total_losses_per_hand,
+        "push_per_hand": total_pushes_per_hand,
         "bankruptices": total_banruptcy,
         "cards_left" : deck_size,});
 
