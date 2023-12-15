@@ -37,7 +37,7 @@
             <!-- card deck and counting -->
             <div class="game_settings_1" title="If the game will have a set deck size (2-8 deck size of 52 cards)">
                 <p id="setting_limited_deck">
-                    <input type="checkbox" id="card_counting_toggle" onclick="card_counting_toggle()">
+                    <input type="checkbox" id="card_counting_toggle" checked onclick="card_counting_toggle()">
                     Finite Deck
                 </p>
                 <div class="game_card_settings" id="game_card_settings">
@@ -131,9 +131,10 @@
                 <div class="action_buttons">
                     <button class="button" style="margin: 4px" id="hit_button_2" onclick="action_hit()">Hit</button>
                     <button class="button" style="margin: 4px" id="stand_button_2" onclick="action_stand()">Stand</button>
-                    <button class="button" style="margin: 4px" id="double_button_2" onclick="action_double()">Double</button>
-                    <button class="button" style="margin: 4px" id="split_button_2" onclick="action_split()">Split</button>
+                    <button class="button" style="margin: 4px" id="double_button_2" title="x2 your bet and get one card." onclick="action_double()">Double</button>
+                    <button class="button" style="margin: 4px" id="split_button_2" title="Split your hand into two seperate hands, betting on both too." onclick="action_split()">Split</button>
                 </div>
+                <p>POTENTIAL: <span class="money_text" id="money_change">0</span></p>
             </div>
         </div>
 
@@ -151,8 +152,8 @@
         <div class="action_buttons">
             <button class="button" id="hit_button" onclick="action_hit()">Hit</button>
             <button class="button" id="stand_button" onclick="action_stand()">Stand</button>
-            <button class="button" id="double_button" onclick="action_double()">Double</button>
-            <button class="button" id="split_button" onclick="action_split()">Split</button>
+            <button class="button" id="double_button" title="x2 your bet and get one card." onclick="action_double()">Double</button>
+            <button class="button" id="split_button" title="Split your hand into two seperate hands, betting on both too." onclick="action_split()">Split</button>
             <button class="button" id="surrender_button" title="Surrender with 50% of your bet returned." onclick="action_surrender()">Surrender</button>
         </div>
 
