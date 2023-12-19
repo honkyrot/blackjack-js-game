@@ -47,7 +47,7 @@ function save_current_data_entry() {
         "win_per_hand": total_wins_per_hand,
         "loss_per_hand": total_losses_per_hand,
         "push_per_hand": total_pushes_per_hand,
-        "bankruptices": total_banruptcy,
+        "bankruptcies": total_bankruptcies,
         "cards_left" : deck_size,});
 
         data_indexed_entries++;

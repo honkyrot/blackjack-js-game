@@ -2,6 +2,8 @@
 // Created by: Honkyrot on 09/23/2023 (hey thats my birthday!)
 // inspired by https://github.com/therealgman2016 to make this
 
+let version = "v1.0";
+
 //game variables
 let dealer_hand = [];
 let player_turn = true;
@@ -59,7 +61,7 @@ let total_resets = 0;
 let total_wins = 0;
 let total_pushes = 0;
 let total_losses = 0;
-let total_banruptcy = 0;  // when you lose all your money
+let total_bankruptcies = 0;  // when you lose all your money
 
 let total_wins_per_hand = 0;  // counts wins seperately for each hand instead of all hands combined
 let total_losses_per_hand = 0;
@@ -95,9 +97,11 @@ const card_deck = [
 ];
 
 let temp_deck = [];
-const down_card = {src:'blue.svg', value:0, suit:"back"};
+const down_card = {src:'blue.svg', value:0, suit:"back"};  // permanent down card
 
 //ids
+const version_text = document.getElementById("version_text");
+
 const dealer_hand_container = document.getElementById("dealers_hand_container");
 const players_hand_container = document.getElementById("players_hand_container");
 const player_hand_container = document.getElementById("players_hands_extra");
@@ -424,6 +428,40 @@ function dealer_first_start() {
         set_player_index(0);  // reset the current player index
         split_check(0);
         check_scores();
+
+        check_ace(dealer_hand, dealer_score, false);
+
+        var hands_with_blackjack = 0;
+
+        for (let i = 0; i < players_hand_count; i++) {
+            if (player_score[i] == 21) {
+                player_hand_variables[i].blackjack = true;
+                hands_with_blackjack++;
+            }
+        }
+
+        // if hands with blackjack is equal to the maximum hands, skip to the dealer's turn
+        if (dealer_score == 21) {
+            player_turn = false;
+            push_message("Dealer has blackjack!");
+            deactivate_action_buttons();
+            check_final_scores();
+
+            // visualize that the dealer has blackjack
+            setTimeout(() => {
+                dealer_hand_container.innerHTML = "";
+                visualize_card(dealer_hand[0], dealer_hand_container);
+                visualize_card(dealer_hand[1], dealer_hand_container);
+            }, 50 * maximum_hands + 50);
+            
+
+            return;
+        }
+        if (hands_with_blackjack == maximum_hands) {
+            player_turn = false;
+            deactivate_action_buttons();
+            change_hands();
+        }
     }, 50 * maximum_hands);
     
     //player_hand.push(card3, card4);
@@ -431,29 +469,10 @@ function dealer_first_start() {
 
     //var player_score_text = get_current_player_score_text();
     //player_score_text.innerHTML = player_score;
-
-    check_ace(dealer_hand, dealer_score, false);
-
     //split_check();
     update_gui();
 
     // check all scores to see if player has blackjack
-    var hands_with_blackjack = 0;
-
-    for (let i = 0; i < players_hand_count; i++) {
-        if (player_score[i] == 21) {
-            player_hand_variables[i].blackjack = true;
-            hands_with_blackjack++;
-            console.log("Blackjack! VERY LONG WIN MESSAGE GOES HERE, MAYBE");
-        }
-    }
-
-    // if hands with blackjack is equal to the maximum hands, skip to the dealer's turn
-    if (hands_with_blackjack == maximum_hands) {
-        player_turn = false;
-        deactivate_action_buttons();
-        change_hands();
-    }
 }
 
 // updates all the text in every player's hand
@@ -502,7 +521,7 @@ function update_gui() {
     stats_losses.innerHTML = total_losses;
     stats_pushes.innerHTML = total_pushes;
     stats_win_percent.innerHTML = `${Math.floor((total_wins / total_resets) * 100)}%`;
-    stats_banruptcy.innerHTML = total_banruptcy;
+    stats_banruptcy.innerHTML = total_bankruptcies;
 }
 
 // check ace function
@@ -663,6 +682,10 @@ function check_final_scores() {
                         push_hand_message(i, "WIN", "Won: \$" + player_hand_variables[i].bet, "lightgreen");
                     }, timeout * i);
 
+                    if (player_hand_variables[i].blackjack == true) {
+                        player_hand_variables[i].bet *= 1.5;
+                    }
+
                     potential_earnings += player_hand_variables[i].bet;
                     console.log("Player won: " + player_hand_variables[i].bet);
                 }
@@ -728,6 +751,10 @@ function check_final_scores() {
     
         //console.log(temp_hands_won, temp_hands_lost, temp_hands_busted, temp_hands_pushed);
     
+        if (data_save) {
+            save_current_data_entry();  
+        }
+
         reset_able = true;
     }, (timeout * total_loops) + timeout);
 }
@@ -872,9 +899,13 @@ function action_split() {
     add_to_player_score(current_player_index, new_card.value);
     check_ace(player_hand[current_player_index], player_score[current_player_index ], true);
 
-    // create a new hand
-    
-    console.log(maximum_hands, temp_hands_split, current_player_index);
+    // check if taken card is an used ace
+    if (taken_card.value == 1) {
+        taken_card.value = 11;
+    }
+
+    // create a new hand with the taken card
+    //console.log(maximum_hands, temp_hands_split, current_player_index);
     var number_of_hands = maximum_hands;
     push_player_card(number_of_hands, taken_card);
     var new_div = assigned_player_div
@@ -892,7 +923,7 @@ function action_split() {
     bet += old_card_bet;
     potential_total += old_card_bet;
 
-    console.log("AASASDSD", number_of_hands, old_index);
+    //console.log("AASASDSD", number_of_hands, old_index);
     // change the text
 
     current_player_index = old_index;
@@ -901,6 +932,7 @@ function action_split() {
 
     maximum_hands++;
     temp_hands_split++;
+    update_gui();
 }
 
 
@@ -913,6 +945,7 @@ function action_surrender() {
     potential_earnings -= Math.floor(player_hand_variables[current_player_index].bet / 2);
     potential_total -= Math.floor(player_hand_variables[current_player_index].bet / 2);
     change_hands();
+    update_gui();
 }
 
 let cards_drawn = 0;
@@ -1121,9 +1154,6 @@ function reset_game() {
         reset_able = false
         game_over = false;
         // if data saving is enabled, call the data saving function
-        if (data_save) {
-            save_current_data_entry();  
-        }
 
         // clear all timeouts, hacky way to do it
         var highest_timeout_id = setTimeout(";");
@@ -1188,7 +1218,7 @@ function reset_game() {
             push_message("You get a small grant of \$10,000 to start over.");
             //money = 10000;
             set_money(starting_money);
-            total_banruptcy++;
+            total_bankruptcies++;
         }
 
         // automatic bet
@@ -1322,3 +1352,5 @@ activate_betting_buttons();
 push_message("Welcome to Blackjack!");
 push_message("Start the game with any bet.");
 reset_game();
+
+version_text.innerHTML = version;  // set the version text
