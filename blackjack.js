@@ -2,7 +2,7 @@
 // Created by: Honkyrot on 09/23/2023 (hey thats my birthday!)
 // inspired by https://github.com/therealgman2016 to make this
 
-let version = "v1.0";
+let version = "v1.1";
 
 //game variables
 let dealer_hand = [];
@@ -33,6 +33,7 @@ let bet = 0;
 let bet_percent = 0;
 let potential_earnings = 0; // how much you can earn (or lose)
 let potential_total = 0;  // total potential earnings so you can see how much you can burn
+let actual_earnings = 0;  // how much you actually earned (or lost)
 
 //gameplay variables
 let game_active = false;
@@ -62,6 +63,9 @@ let total_wins = 0;
 let total_pushes = 0;
 let total_losses = 0;
 let total_bankruptcies = 0;  // when you lose all your money
+
+// more stats variables
+let current_win_percent = 0;
 
 let total_wins_per_hand = 0;  // counts wins seperately for each hand instead of all hands combined
 let total_losses_per_hand = 0;
@@ -291,6 +295,12 @@ function get_random_card() {
 
 // starts the game
 function start_game() {
+    if (data_save) {
+        save_current_data_entry();  
+    }
+
+    actual_earnings = 0;
+
     create_deck();
 
     dealer_hand_container.innerHTML = "";
@@ -749,6 +759,7 @@ function check_final_scores() {
     
         //console.log(temp_hands_won, temp_hands_lost, temp_hands_busted, temp_hands_pushed);
 
+        actual_earnings += potential_earnings;
         reset_able = true;
     }, (timeout * total_loops) + timeout);
 }
@@ -1147,10 +1158,10 @@ function reset_game() {
     if (reset_able || game_over) {
         reset_able = false
         game_over = false;
-        if (data_save) {
-            save_current_data_entry();  
-        }
+
+        // commit stats
         total_resets++;  // add to the total resets
+        current_win_percent = Math.floor((total_wins / total_resets) * 100);
 
         // clear all timeouts, hacky way to do it
         var highest_timeout_id = setTimeout(";");

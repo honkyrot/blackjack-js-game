@@ -50,10 +50,10 @@
             <!-- data saving -->
             <div class="game_settings_2" title="Enable this to start recording data for visualization purposes.">
                 <p id="setting_data_visualization">
-                    <input type="checkbox" id="data_visualization_toggle" onclick="data_save_toggle()">
+                    <input type="checkbox" id="data_visualization_toggle" checked onclick="data_save_toggle()">
                     CSV Data Saving
                 </p>
-                <div class="game_card_settings" id="export_data_div">
+                <div class="game_card_settings" style="display: block;" id="export_data_div">
                     <button class="game_setting_button" style="border-radius: 8px;" id="export_data_button" onclick="export_data_csv()">Export Data</button>
                     <p><span id="game_data_current_entries_text">0 entries</span></p>
                 </div>

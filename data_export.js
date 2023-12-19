@@ -3,7 +3,7 @@
 // saves blackjack related data
 
 // variables
-let data_save = false;  // whether to save data or not
+let data_save = true;  // whether to save data or not
 let data_entries = [];  // the data entries
 let data_indexed_entries = 0;  // the number of entries in the current data entry
 
@@ -39,7 +39,7 @@ function save_current_data_entry() {
         {"game": total_resets, 
         "money" : money,
         "bet": bet,
-        "potential_earnings": potential_earnings,
+        "actual_earnings": actual_earnings,
         "wins": total_wins,
         "loss" : total_losses,
         "pushes": total_pushes,
@@ -48,7 +48,8 @@ function save_current_data_entry() {
         "loss_per_hand": total_losses_per_hand,
         "push_per_hand": total_pushes_per_hand,
         "bankruptcies": total_bankruptcies,
-        "cards_left" : deck_size,});
+        "cards_left" : deck_size,
+        "win_percentage": current_win_percent,});
 
         data_indexed_entries++;
         game_data_current_entries_text.innerHTML = data_indexed_entries.toString() + " entries";
