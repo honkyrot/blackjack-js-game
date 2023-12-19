@@ -291,8 +291,6 @@ function get_random_card() {
 
 // starts the game
 function start_game() {
-    total_resets++;  // add to the total resets
-
     create_deck();
 
     dealer_hand_container.innerHTML = "";
@@ -750,10 +748,6 @@ function check_final_scores() {
         }
     
         //console.log(temp_hands_won, temp_hands_lost, temp_hands_busted, temp_hands_pushed);
-    
-        if (data_save) {
-            save_current_data_entry();  
-        }
 
         reset_able = true;
     }, (timeout * total_loops) + timeout);
@@ -1153,7 +1147,10 @@ function reset_game() {
     if (reset_able || game_over) {
         reset_able = false
         game_over = false;
-        // if data saving is enabled, call the data saving function
+        if (data_save) {
+            save_current_data_entry();  
+        }
+        total_resets++;  // add to the total resets
 
         // clear all timeouts, hacky way to do it
         var highest_timeout_id = setTimeout(";");
