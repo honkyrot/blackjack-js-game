@@ -2,7 +2,7 @@
 // Created by: Honkyrot on 09/23/2023 (hey thats my birthday!)
 // inspired by https://github.com/therealgman2016 to make this
 
-let version = "v1.1";
+let version = "v1.2";
 
 //game variables
 let dealer_hand = [];
@@ -66,6 +66,10 @@ let total_bankruptcies = 0;  // when you lose all your money
 
 // more stats variables
 let current_win_percent = 0;
+let current_loss_percent = 0;
+let current_push_percent = 0;
+let money_gained = 0;
+let money_lost = 0;
 
 let total_wins_per_hand = 0;  // counts wins seperately for each hand instead of all hands combined
 let total_losses_per_hand = 0;
@@ -458,9 +462,10 @@ function dealer_first_start() {
             // visualize that the dealer has blackjack
             setTimeout(() => {
                 dealer_hand_container.innerHTML = "";
+                dealer_score_text.innerHTML = dealer_score;
                 visualize_card(dealer_hand[0], dealer_hand_container);
                 visualize_card(dealer_hand[1], dealer_hand_container);
-            }, 50 * maximum_hands + 50);
+            }, 50 * maximum_hands + 200);
             
 
             return;
@@ -740,6 +745,7 @@ function check_final_scores() {
             }
     
             total_wins++;
+            money_gained += potential_earnings;
     
             transition_win_background();
         } else if (potential_earnings < 0) {
@@ -747,6 +753,7 @@ function check_final_scores() {
             increment_money(potential_earnings);
     
             total_losses++;
+            money_lost -= Math.abs(potential_earnings);
     
             transition_loss_background();
         } else {
@@ -1162,6 +1169,8 @@ function reset_game() {
         // commit stats
         total_resets++;  // add to the total resets
         current_win_percent = Math.floor((total_wins / total_resets) * 100);
+        current_loss_percent = Math.floor((total_losses / total_resets) * 100);
+        current_push_percent = Math.floor((total_pushes / total_resets) * 100);
 
         // clear all timeouts, hacky way to do it
         var highest_timeout_id = setTimeout(";");
