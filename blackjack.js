@@ -58,7 +58,7 @@ let deck_count_max = 8;  // max amount of decks to use, only works if infinite_d
 let minimum_cards_left = 40;  // minimum amount of cards left before the deck is reshuffled, only works if infinite_deck is false
 
 // stats variables
-let total_resets = 0;
+let total_resets = -1;
 let total_wins = 0;
 let total_pushes = 0;
 let total_losses = 0;
@@ -299,10 +299,6 @@ function get_random_card() {
 
 // starts the game
 function start_game() {
-    if (data_save) {
-        save_current_data_entry();  
-    }
-
     actual_earnings = 0;
 
     create_deck();
@@ -465,7 +461,7 @@ function dealer_first_start() {
                 dealer_score_text.innerHTML = dealer_score;
                 visualize_card(dealer_hand[0], dealer_hand_container);
                 visualize_card(dealer_hand[1], dealer_hand_container);
-            }, 50 * maximum_hands + 200);
+            }, 50 * maximum_hands + 100);
             
 
             return;
@@ -473,7 +469,11 @@ function dealer_first_start() {
         if (hands_with_blackjack == maximum_hands) {
             player_turn = false;
             deactivate_action_buttons();
-            change_hands();
+
+            // delay for card visualization to finish
+            setTimeout(() => {
+                change_hands();
+            }, 50 * maximum_hands + 100);
         }
     }, 50 * maximum_hands);
     
@@ -1163,6 +1163,10 @@ function create_deck() {
 // resets the game
 function reset_game() {
     if (reset_able || game_over) {
+        if (data_save) {
+            save_current_data_entry();  
+        }
+        
         reset_able = false
         game_over = false;
 
