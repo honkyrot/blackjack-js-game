@@ -1,5 +1,6 @@
 # blackjack-js-game
-A game of blackjack, casino rules apply.
+A game of blackjack, casino rules apply. You play with fake money to gamble. Simulated gambling.
+Please understand the risks of gambling and the addiction of gambling.
 
 You will play against the computer in a simulated game of blackjack.
 

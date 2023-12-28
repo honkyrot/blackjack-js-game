@@ -49,7 +49,11 @@ function save_current_data_entry() {
         "push_per_hand": total_pushes_per_hand,
         "bankruptcies": total_bankruptcies,
         "cards_left" : deck_size,
-        "win_percentage": current_win_percent,});
+        "win_percentage": current_win_percent,
+        "loss_percentage": current_loss_percent,
+        "push_percentage": current_push_percent,
+        "money_gained": money_gained,
+        "money_lost": money_lost,});
 
         data_indexed_entries++;
         game_data_current_entries_text.innerHTML = data_indexed_entries.toString() + " entries";
