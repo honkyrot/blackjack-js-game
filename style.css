@@ -193,6 +193,7 @@ h2 {
     top: 0%;
     transition: all 0.3s linear;
     outline: 2px solid #ffffff;
+    box-shadow: inset 0px 0px 4px #ffffff;
 }
 
 /* text for selected hand box */
