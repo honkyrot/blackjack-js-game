@@ -1163,6 +1163,7 @@ function create_deck() {
 // resets the game
 function reset_game() {
     if (reset_able || game_over) {
+        total_resets++;  // add to the total resets
         if (data_save) {
             save_current_data_entry();  
         }
@@ -1171,7 +1172,6 @@ function reset_game() {
         game_over = false;
 
         // commit stats
-        total_resets++;  // add to the total resets
         current_win_percent = Math.floor((total_wins / total_resets) * 100);
         current_loss_percent = Math.floor((total_losses / total_resets) * 100);
         current_push_percent = Math.floor((total_pushes / total_resets) * 100);
