@@ -8,8 +8,16 @@
 </head>
 
 <header>
+    <div class="apex_title unselectable" id="apex_title">
+        <div class="apex_title_decor" id="apex_title_decor">
+            <div class="bg_apex_title_decor" id="bg_apex_title_decor"></div>
+        </div>
+        <h1 style="position: relative;"><span class="apex_title_text" id="apex_title_text">honkyrot.dev</span> - blackjack-js-game - <span id="version_text">v1.0</span><span class="page_title_text" id="page_title_text"></span></h1>
+        
+    </div>
+
     <div class="title_div">
-        <h1>blackjack-js-game - <span id="version_text">v1.0</span></h1>
+        <h1>&nbsp;</h1>
         
     </div>
 
@@ -44,7 +52,7 @@
                 </p>
                 <div class="game_card_settings" id="game_card_settings">
                     <p>Deck Size: <input class="deck_custom_size" type="number" id="custom_deck_input" placeholder="2-8" value="8"></p>
-                    <button class="game_setting_button" style="border-radius: 8px;" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
+                    <button class="game_setting_button" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
                 </div>
             </div>
 
@@ -55,7 +63,7 @@
                     CSV Data Saving
                 </p>
                 <div class="game_card_settings" style="display: block;" id="export_data_div">
-                    <button class="game_setting_button" style="border-radius: 8px;" id="export_data_button" onclick="export_data_csv()">Export Data</button>
+                    <button class="game_setting_button" id="export_data_button" onclick="export_data_csv()">Export Data</button>
                     <p><span id="game_data_current_entries_text">0 entries</span></p>
                 </div>
             </div>
@@ -68,7 +76,7 @@
                 </p>
                 <div class="game_card_settings" id="starting_amount_div">
                     <p>Starting Amount: <input class="starting_amount_input" type="number" id="starting_amount_input" placeholder="0" value="10000"></p>
-                    <button class="game_setting_button" style="border-radius: 8px;" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
+                    <button class="game_setting_button" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
                 </div>
             </div>
 
@@ -88,14 +96,18 @@
                 </p>
                 <div class="game_card_settings" id="hands_starting_div">
                     <p>Starting Amount: <input class="starting_amount_input" type="number" id="starting_hands_input" placeholder="0" value="1"></p>
-                    <button class="game_setting_button" style="border-radius: 8px;" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
+                    <button class="game_setting_button" id="game_setting_apply_button" onclick="apply_game_settings()">Apply</button>
                 </div>
             </div>
         </div>
     </div>
+
+    
 </header>
 
 <body>
+    
+
     <div class="playing_board" id="playing_board">
 
         <!-- Dealer section -->
@@ -113,7 +125,7 @@
 
         <div class="line_split_1">
             <div class="center_text_middle">
-                <p style="color: #000000; margin: 0; font-size: 14px;">BLACKJACK PAYS 3 to 2</p>
+                <p style="color: #000000; margin: 0; font-size: 16px;">BLACKJACK PAYS 3 to 2</p>
             </div>
         </div>  <!-- Line Split -->
 

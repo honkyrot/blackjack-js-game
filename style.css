@@ -1,6 +1,6 @@
-@font-face { /*custom font Montserrat*/
-    font-family: "Montserrat";
-    src: url("media/Montserrat-Medium.ttf");
+@font-face { /*custom font JetBrains*/
+    font-family: "JetBrains Mono";
+    src: url("media/JetBrainsMono-Regular.ttf");
 }
 
 html {
@@ -11,7 +11,7 @@ html {
 
 /* general */
 p {
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     color: #ffffff;
     font-size: 22px;
     margin: 10px;
@@ -21,30 +21,70 @@ p {
 /* background */
 /* background is black for now */
 body {
-    background-color: #000000;
+    background-color: #212738;
 }
 
 /* title h1 */
 h1 {
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     color: #ffffff;
     font-size: 40px;
 }
 
 /* slighty bigger font for h2 */
 h2 {
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     color: #ffffff;
     font-size: 30px;
     margin: 10px;
 }
 
+
+/* the color of my website */
+:root {
+    --web_color: #0eeadf;
+}
+
 /* classes */
+
+/* website title */
+.apex_title {
+    color: #ffffff;
+    font-size: 30px;
+    text-align: left;
+    position: absolute;
+    margin-top: 10px;
+    left: 46px;
+    transition: 0.5s opacity;
+    z-index: 1;
+    top: 6px;
+}
+
+.apex_title_decor {
+    background-color: #FF0080;
+    position: absolute;
+    width: 0px;
+    height: 70%;
+    top: 16px;
+    left: -14px;
+    transition: 0.5s all;
+}
+
+.bg_apex_title_decor {
+    background-color: #ffffff;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: -5px;
+    left: -5px;
+    z-index: -2;
+    transition: 0.6s all;
+}
 
 /* background div gradient */
 /* gradient is dymanic to show whos turn it is, here is a simple placeholder */
 .background_gradient {  
-    background: linear-gradient(to bottom, #0099ff, #000000);
+    background: linear-gradient(to bottom, #212738, #212738);
     background-size: 400% 100%;
     position: fixed;
     top: 0;
@@ -53,11 +93,11 @@ h2 {
     height: 100%;
     z-index: -6;
     opacity: 1;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .background_gradient_overlay_loss {  
-    background: linear-gradient(to bottom, #ff0000, #000000);
+    background: linear-gradient(to bottom, #ff0000, #212738);
     background-size: 400% 100%;
     position: fixed;
     top: 0;
@@ -66,11 +106,11 @@ h2 {
     height: 100%;
     z-index: -5;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .background_gradient_overlay_win {
-    background: linear-gradient(to bottom, #00ff00, #000000);
+    background: linear-gradient(to bottom, #00ff00, #212738);
     background-size: 400% 100%;
     position: fixed;
     top: 0;
@@ -92,14 +132,9 @@ h2 {
     transition: text-shadow 0.5s ease;
 }
 
-.title_div:hover {
-    text-shadow: 0px 0px 5px #ffffff;
-}
-
 /* for the cards and stuff to be held in */
 .playing_board {
-    background-color: rgba(100, 100, 100, 0.5);
-    border-radius: 16px;
+    background-color: rgba(100, 100, 100, 0.2);
     padding: 2px;
     height: 70%;
     position: relative;
@@ -125,11 +160,9 @@ h2 {
 
 /* dealer hand score */
 .dealer_hand_value_div {
-    background-color: #000000;
     padding: 0px;
     width: fit-content;
     position: relative;
-    border-radius: 12px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -143,12 +176,13 @@ h2 {
     background-color: rgba(0, 0, 0, 0);
     padding: 0px;
     margin: 0px;
-    width: fit-content;
-    height: 200px;
     left: 5%;
+    width: fit-content;
     position: relative;
     z-index: 2;
     transition: all 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column;
 }
 
 /* for extra hands */
@@ -157,10 +191,11 @@ h2 {
     padding: 0px;
     margin: 0px;
     margin-bottom: 40px;
-    width: fit-content;
     height: 150px;
+    width: fit-content;
     position: relative;
     transition: left 0.5s ease-in-out;
+    /* center flex items */
 }
 
 /* player hand score */
@@ -169,7 +204,6 @@ h2 {
     padding: 0px;
     width: fit-content;
     position: relative;
-    border-radius: 12px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -192,8 +226,9 @@ h2 {
     z-index: 0;
     top: 0%;
     transition: all 0.3s linear;
-    outline: 2px solid #ffffff;
-    box-shadow: inset 0px 0px 4px #ffffff;
+    border-width: 2px;
+    border-style: solid;
+    border-image: linear-gradient(to right, rgb(255, 255, 255), var(--web_color)) 1;
 }
 
 /* text for selected hand box */
@@ -206,9 +241,8 @@ h2 {
 /* funny little line */
 .line_split_1 {
     background-color: #ffffff;
-    border-radius: 5px;
     width: 50%;
-    height: 10px;
+    height: 13px;
     left: 50%;
     position: relative;
     transform: translateX(-50%);
@@ -226,10 +260,9 @@ h2 {
 
 /* your body for actions div */
 .game_div {
-    background-color: rgba(100, 100, 100, 0.5);
+    background-color: rgba(100, 100, 100, 0.2);
     position: relative;
     top: 10px;
-    border-radius: 16px;
     height: 25%;
 }
 
@@ -324,7 +357,6 @@ h2 {
 .game_message_box{
     background-color: #000000;
     position: absolute;
-    border-radius: 16px;
     top: 2%;
     left: 65%;
     width: 34.6%;
@@ -334,7 +366,6 @@ h2 {
 /* the main button class */
 .button {
     background-color: #ffffff;
-    border-radius: 16px;
     padding: 8px;
     margin: 8px;
     display: inline-block;
@@ -343,14 +374,13 @@ h2 {
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     transition: background-color 0.25s;
 }
 
 /* smaller buttons! */
 .button_small {
     background-color: #ffffff;
-    border-radius: 16px;
     padding: 8px;
     margin: 8px;
     margin-right: 1px;
@@ -360,14 +390,13 @@ h2 {
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     transition: background-color 0.25s;
 }
 
 /* the larger button class */
 .button_large {
     background-color: #ffffff;
-    border-radius: 16px;
     padding: 8px;
     margin: 8px;
     display: inline-block;
@@ -376,14 +405,13 @@ h2 {
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     transition: background-color 0.25s;
 }
 
 /* input bar for custom betting */
 .custom_bet_input {
     background-color: #ffffff;
-    border-radius: 16px;
     padding: 8px;
     margin: 8px;
     display: inline-block;
@@ -392,7 +420,7 @@ h2 {
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
 }
 
 /* card elements */
@@ -400,7 +428,7 @@ h2 {
     width: 100px;
     height: 150px;
     border: 2px solid black;
-    border-radius: 5px;
+    border-radius: 2px;
     margin: 4px;
     box-shadow: 0px 0px 5px black;
     position: relative;
@@ -419,7 +447,7 @@ h2 {
 .game_stats {
     position: absolute;
     top: 0%;
-    left: 0%;
+    right: 175px;
     z-index: 1;
 }
 
@@ -431,28 +459,28 @@ h2 {
 /* game status dropdown */
 .game_stats_dropdown{
     background-color: #000000;
-    border-radius: 16px;
     padding: 8px;
     margin: 8px;
+    margin-top: 48px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     display: none;
 }
 
 /* game status dropdown button */
 .game_stats_dropdown_button {
-    background-color: #ffffff;
-    border-radius: 16px;
+    background-color: var(--web_color);
     padding: 2px;
     margin: 4px;
-    margin-left: 8px;
+    right: 0;
+    position: absolute;
     display: inline-block;
     width: 160px;
     height: 32px;
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
 }
 
 /* game setting div */
@@ -464,8 +492,7 @@ h2 {
 
 /* game setting dropdown button, also does the menu */
 .game_setting_button {
-    background-color: #ffffff;
-    border-radius: 16px;
+    background-color: var(--web_color);
     padding: 2px;
     margin: 4px;
     margin-left: 8px;
@@ -475,21 +502,20 @@ h2 {
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
 }
 
 /* game setting dropdown */
 .game_settings_dropdown {
     position: absolute;
     background-color: #000000;
-    border-radius: 16px;
     padding: 4px;
     margin: 8px;
     width: 200%;
     right: 0%;
     display: none;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
     z-index: 1;
 }
 
@@ -503,7 +529,6 @@ h2 {
 /* menu extenstion for card settings */
 .game_card_settings {
     background-color: #525252;
-    border-radius: 8px;
     padding: 4px;
     margin: 8px;
 }
@@ -511,13 +536,12 @@ h2 {
 /* input bar for custom deck size */
 .deck_custom_size {
     background-color: #ffffff;
-    border-radius: 16px;
     width: 80px;
     height: 24px;
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
 }
 
 /* input div, disabled on start */
@@ -528,13 +552,12 @@ h2 {
 /* input bar for custom hand size */
 .starting_amount_input {
     background-color: #ffffff;
-    border-radius: 16px;
     width: 200px;
     height: 24px;
     text-align: center;
     line-height: 0px;
     font-size: 20px;
-    font-family: "Montserrat";
+    font-family: "JetBrains Mono";
 }
 
 /* text to be plastered on the screen */
@@ -542,7 +565,7 @@ h2 {
     position: absolute;
     top: 0%;
     left: 50%;
-    width: 100vw;
+    width: 90vw;
     transform: translateX(-50%);
     height: 100%;
     text-align: center;
