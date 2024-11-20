@@ -3,35 +3,35 @@
 // saves blackjack related data
 
 // variables
-let data_save = true;  // whether to save data or not
-let data_entries = [];  // the data entries
-let data_indexed_entries = 0;  // the number of entries in the current data entry
+let data_save = true  // whether to save data or not
+let data_entries = []  // the data entries
+let data_indexed_entries = 0  // the number of entries in the current data entry
 
 // elements
-const game_export_data_div = document.getElementById("export_data_div");
-const game_data_current_entries_text = document.getElementById("game_data_current_entries_text");
-const game_export_data_button = document.getElementById("export_data_button");
+const game_export_data_div = document.getElementById("export_data_div")
+const game_data_current_entries_text = document.getElementById("game_data_current_entries_text")
+const game_export_data_button = document.getElementById("export_data_button")
 
 // toggle data saving
 function data_save_toggle() {
     if (data_save) {
-        push_message("Data recording disabled.");
-        game_export_data_div.style = "display: none;";
+        push_message("Data recording disabled.")
+        game_export_data_div.style = "display: none"
     }
     else
     {
-        push_message("Data recording enabled.");
-        game_export_data_div.style = "display: block;";
+        push_message("Data recording enabled.")
+        game_export_data_div.style = "display: block"
     }
-    data_save = !data_save;
+    data_save = !data_save
 }
 
 // save current data entry
 function save_current_data_entry() {
-    var deck_size = temp_deck.length;
+    var deck_size = temp_deck.length
     // if infinite deck, set deck size to 0
     if (infinite_deck) {
-        deck_size = 0;
+        deck_size = 0
     }
 
     if (data_save) {
@@ -53,43 +53,43 @@ function save_current_data_entry() {
         "loss_percentage": current_loss_percent,
         "push_percentage": current_push_percent,
         "money_gained": money_gained,
-        "money_lost": money_lost,});
+        "money_lost": money_lost,})
 
-        data_indexed_entries++;
-        game_data_current_entries_text.innerHTML = data_indexed_entries.toString() + " entries";
-        console.log(data_entries);
+        data_indexed_entries++
+        game_data_current_entries_text.innerHTML = data_indexed_entries.toString() + " entries"
+        console.log(data_entries)
     }
 }
 
 // export data to csv
 function export_data_csv() {
     if (data_save && data_entries.length > 0) {
-        push_message("Exporting data to csv...");
+        push_message("Exporting data to csv...")
         // funky shit, helped by https://www.geeksforgeeks.org/how-to-create-and-download-csv-file-in-javascript/
-        csv_rows = [];
-        const headers = Object.keys(data_entries[0]);
-        csv_rows.push(headers.join(","));
+        csv_rows = []
+        const headers = Object.keys(data_entries[0])
+        csv_rows.push(headers.join(","))
         const values = data_entries.map(row => {
             const values = headers.map(header => {
-                const escaped = ("" + row[header]).replace(/"/g, '\\"');
-                return `"${escaped}"`;
-            });
-            return values.join(",");
-        });
+                const escaped = ("" + row[header]).replace(/"/g, '\\"')
+                return `"${escaped}"`
+            })
+            return values.join(",")
+        })
 
         // i dunno how this shit works
-        csv_rows.push(values.join("\n"));
-        const csvData = csv_rows.join("\n");
-        const blob = new Blob([csvData], { type: "text/csv" });
-        const url = window.URL.createObjectURL(blob);
+        csv_rows.push(values.join("\n"))
+        const csvData = csv_rows.join("\n")
+        const blob = new Blob([csvData], { type: "text/csv" })
+        const url = window.URL.createObjectURL(blob)
 
         // what
-        const a = document.createElement("a");
-        a.setAttribute("hidden", "");
-        a.setAttribute("href", url);
-        a.setAttribute("download", "blackjack_data.csv");
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const a = document.createElement("a")
+        a.setAttribute("hidden", "")
+        a.setAttribute("href", url)
+        a.setAttribute("download", "blackjack_data.csv")
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
     }
 }
